@@ -74,6 +74,12 @@ export default function HomeScreen() {
           <ThemedText type="defaultSemiBold">app-example</ThemedText>.
         </ThemedText>
       </ThemedView>
+      <ThemedView style={styles.stepContainer}>
+        <Link href="/example">
+          <ThemedText type="subtitle">Ver componente de ejemplo</ThemedText>
+        </Link>
+        <ThemedText>Haz clic para abrir la ruta <ThemedText type="defaultSemiBold">/example</ThemedText> y ver el componente editable.</ThemedText>
+      </ThemedView>
     </ParallaxScrollView>
   );
 }
