@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+{
+    'name': 'Insurance API',
+    'version': '18.0.1.0.9',
+    'summary': 'Add insurance details to sales orders',
+    'description': '''
+This module extends the sales order model to include additional fields for managing insurance details such as policy number, school year, insurer, insured amount, event limits, and maximum quantities of events.
+    ''',
+    'category': 'Productivity',
+    'author': 'Zymo Dev Team',
+    'company': 'Zymo SA',
+    'maintainer': 'Zymo Dev Team',
+    'website': 'https://www.etherit.es/shop',
+    'depends': ['base', 'sale_management', 'account'],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/insurance_api_views.xml',
+        'views/portal_sale_account_payment_term.xml',
+        'views/portal_contract.xml',
+        'views/payment_schedule_sale_order.xml',
+        'views/sale_order_view.xml',
+        'views/account_payment_term_views.xml',
+        'views/sale_order_report.xml',
+        'views/contract_report.xml',
+        'views/contract_styles.xml',
+        'views/custom_layout_tucuman.xml',
+        'views/contract_company_tuc.xml',
+        'views/contract_company_cor.xml',
+        'views/contract_company_nac.xml',
+    ],
+    'license': 'LGPL-3',
+    'installable': True,
+    'application': False,
+    'auto_install': False,
+}

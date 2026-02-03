@@ -8,6 +8,10 @@
     "scheme": "changaya",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "extra": {
+      "supabaseUrl": "https://mjuflmbpbpsltvbjuqzj.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdWZsbWJwYnBzbHR2Ymp1cXpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NzQ5MzYsImV4cCI6MjA4MTE1MDkzNn0.4be5UDBeAS1PULHBqxnudo9-i3zOi4Ft5JDVICIhqpg"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -38,7 +42,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

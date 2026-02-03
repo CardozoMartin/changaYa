@@ -1,21 +1,48 @@
+import LoginForm from '@/components/LoginForm/LoginForm';
+import { useAuthSessionStore } from '@/store/authSessionStore';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function LoginScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState('login'); // 'login' o 'register'
+  
+  const [activeTab, setActiveTab] = useState('login');
+
+  const token = useAuthSessionStore((s) => s.token);
+  const user = useAuthSessionStore((s) => s.user);
+  const rehydrated = useAuthSessionStore((s) => s.rehydrated);
+
+  useEffect(() => {
+    // Si después de la rehidratación hay token, redirigimos según estado del perfil
+    if (rehydrated && token) {
+      if (user?.profileCompleted && user?.acceptTerms) {
+        router.replace('/HomeScreen');
+      } else {
+        // Usuario sin perfil completo o sin aceptar términos: llevar al onboarding
+        router.replace('/(tabs)/OnboardingScreen');
+      }
+    }
+  }, [rehydrated, token, user, router]);
+
+  //funcion para cambiar la vista a registro (navega a la pantalla de registro)
+  const handleSwitchToRegister = () => {
+    setActiveTab('register');
+    router.push('/auth/RegisterScreen');
+  }
+
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -24,15 +51,17 @@ export default function LoginScreen() {
       <View style={styles.content}>
         {/* Header con logo */}
         <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <View style={styles.logoBadge}>
-              <View style={styles.briefcaseIcon}>
-                <View style={styles.briefcaseHandle} />
-                <View style={styles.briefcaseBody} />
-              </View>
-            </View>
-            <Text style={styles.logoText}>ChambaYa</Text>
+          <View style={styles.iconWrapper}>
+          <View style={styles.iconBackground}>
+            {/* Icono de apretón de manos */}
+            <Ionicons name="hand-left-outline" size={60} color="#FFF" style={styles.handIcon} />
           </View>
+          {/* Badge amarillo con rayo */}
+          <View style={styles.badge}>
+            <Ionicons name="flash" size={16} color="#1E3A5F" />
+          </View>
+        </View>
+          <Text style={styles.logoText}>Chamga<Text style={{color: '#F4C542'}}>Ya</Text></Text>
           <Text style={styles.tagline}>Conectando oportunidades</Text>
         </View>
 
@@ -49,7 +78,7 @@ export default function LoginScreen() {
           
           <TouchableOpacity
             style={[styles.tab, activeTab === 'register' && styles.activeTab]}
-            onPress={() => setActiveTab('register')}
+            onPress={handleSwitchToRegister}
           >
             <Text style={[styles.tabText, activeTab === 'register' && styles.activeTabText]}>
               Registrarse
@@ -58,89 +87,9 @@ export default function LoginScreen() {
         </View>
 
         {/* Formulario */}
-        <View style={styles.formContainer}>
-          {/* Email Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Correo Electrónico</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingresa tu correo"
-              placeholderTextColor="#B0B0B0"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-
-          {/* Password Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Contraseña</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="Ingresa tu contraseña"
-                placeholderTextColor="#B0B0B0"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-              />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <View style={styles.eyeIcon}>
-                  <View style={styles.eyeOuter} />
-                  {!showPassword && <View style={styles.eyeSlash} />}
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Forgot Password Link */}
-          <TouchableOpacity style={styles.forgotPasswordContainer}>
-            <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
-          </TouchableOpacity>
-
-          {/* Login Button */}
-          <TouchableOpacity 
-            style={styles.loginButton}
-            onPress={() => router.push('/GoHomeScreen')}
-          >
-            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
-          </TouchableOpacity>
-
-          {/* Divider */}
-          <View style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-            <View style={styles.dividerCircle} />
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Google Button */}
-          <TouchableOpacity style={styles.googleButton}>
-            <View style={styles.googleIconContainer}>
-              <View style={styles.googleIcon}>
-                <View style={[styles.googleSegment, { backgroundColor: '#4285F4' }]} />
-                <View style={[styles.googleSegment, { backgroundColor: '#34A853' }]} />
-                <View style={[styles.googleSegment, { backgroundColor: '#FBBC05' }]} />
-                <View style={[styles.googleSegment, { backgroundColor: '#EA4335' }]} />
-              </View>
-            </View>
-            <Text style={styles.googleButtonText}>Continuar con Google</Text>
-          </TouchableOpacity>
-
-          {/* Terms */}
-          <View style={styles.termsContainer}>
-            <Text style={styles.termsText}>Al registrarte, aceptas nuestros </Text>
-            <TouchableOpacity>
-              <Text style={styles.termsLink}>Términos y Condiciones</Text>
-            </TouchableOpacity>
-            <Text style={styles.termsText}>.</Text>
-          </View>
-        </View>
+        <LoginForm></LoginForm>
       </View>
+       <View style={{ height: 100 }} />
     </SafeAreaView>
   );
 }
@@ -156,13 +105,13 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 30,
+    marginTop: 18,
+    marginBottom: 10,
   },
   logoContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   logoBadge: {
     width: 56,
@@ -171,12 +120,19 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginBottom: 12,
   },
   briefcaseIcon: {
     width: 28,
     height: 28,
     position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoImage: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
   },
   briefcaseHandle: {
     position: 'absolute',
@@ -362,20 +318,21 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderWidth: 1,
     borderColor: '#E8E8E8',
-    marginBottom: 20,
+    marginBottom: 14,
   },
   googleIconContainer: {
     marginRight: 12,
   },
   googleIcon: {
-    width: 20,
-    height: 20,
+    width: 34,
+    height: 24,
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  googleSegment: {
-    width: 10,
-    height: 10,
+  googleIconImage: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
   },
   googleButtonText: {
     fontSize: 16,
@@ -398,4 +355,49 @@ const styles = StyleSheet.create({
     color: '#3B82C8',
     fontWeight: '500',
   },
+  iconWrapper: {
+    position: 'relative',
+    marginBottom: 0,
+  },
+  iconBackground: {
+    width: 100,
+    height: 90,
+    backgroundColor: '#1E4D8B',
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+    transform: [{ rotate: '-5deg' }],
+  },
+  handIcon: {
+    transform: [{ rotate: '-45deg' }, { scaleX: -1 }],
+    marginLeft: -15,
+    marginTop: -10,
+  },
+  badge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    width: 38,
+    height: 38,
+    backgroundColor: '#F4C430',
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  }
 });

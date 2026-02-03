@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="inherit_sale_order_portal_payment_term" inherit_id="sale.sale_order_portal_template" name="Terminos de pago">
+        <xpath expr="//div[@id='portal_sale_content']" position="inside">
+            <t t-if="sale_order.state in ('draft', 'sent')">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fa fa-credit-card"/>
+ Planes de Financiación Disponibles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="payment_term_selector" class="form-label">
+                                <strong>Seleccione su plan de pago preferido:</strong>
+                            </label>
+                            <form id="payment_term_form">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="access_token" t-att-value="sale_order.access_token"/>
+                                <input type="hidden" name="order_id" t-att-value="sale_order.id"/>
+                                <input type="hidden" name="amount_total" t-att-value="sale_order.amount_total"/>
+                                <div class="input-group">
+                                    <select name="payment_term_id" id="payment_term_selector" class="form-select">
+                                        <option value="">-- Seleccione un plan --</option>
+                                        <!-- Opción para plan personalizado manual -->
+                                        <t t-if="not sale_order.payment_term_id and sale_order.payment_schedule_lines">
+                                            <option value="-1" selected="selected">
+                                                <t t-esc="sale_order.get_payment_summary() or 'Plan Personalizado'"/>
+                                            </option>
+                                        </t>
+                                        <t t-foreach="request.env['account.payment.term'].sudo().search([('company_id', 'in', [False, sale_order.company_id.id])])" t-as="term">
+                                            <option t-att-value="term.id" t-att-selected="'selected' if sale_order.payment_term_id.id == term.id else None">
+                                                <t t-esc="term.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <t t-if="sale_order.payment_term_id or sale_order.payment_schedule_lines">
+                            <hr/>
+                            <h6 class="mb-3">
+                                <i class="fa fa-calendar"/>
+                                <strong>Detalle de Cuotas</strong>
+                            </h6>
+                            <t t-if="sale_order.payment_schedule_lines and len(sale_order.payment_schedule_lines) > 1">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Cuota N°</th>
+                                                <th>Vencimiento</th>
+                                                <th class="text-end">Monto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sale_order.payment_schedule_lines" t-as="line">
+                                                <tr>
+                                                    <td>Cuota <t t-esc="line.installment_number"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="line.due_date"/>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <strong>
+                                                            <span t-field="line.amount" t-options='{"widget": "monetary", "display_currency": sale_order.currency_id}'/>
+                                                        </strong>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                        <tfoot class="table-light">
+                                            <tr>
+                                                <th colspan="2" class="text-end">Total:</th>
+                                                <th class="text-end">
+                                                    <strong>
+                                                        <span t-field="sale_order.payment_schedule_total" t-options='{"widget": "monetary", "display_currency": sale_order.currency_id}'/>
+                                                    </strong>
+                                                </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Cuota N°</th>
+                                                <th>Vencimiento</th>
+                                                <th class="text-end">Monto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sale_order.payment_schedule_lines" t-as="line">
+                                                <tr>
+                                                    <td>Cuota <t t-esc="line.installment_number"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="line.due_date"/>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <strong>
+                                                            <span t-field="line.amount" t-options='{"widget": "monetary", "display_currency": sale_order.currency_id}'/>
+                                                        </strong>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                        <tfoot class="table-light">
+                                            <tr>
+                                                <th colspan="2" class="text-end">Total:</th>
+                                                <th class="text-end">
+                                                    <strong>
+                                                        <span t-field="sale_order.payment_schedule_total" t-options='{"widget": "monetary", "display_currency": sale_order.currency_id}'/>
+                                                    </strong>
+                                                </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+        <xpath expr="//div[@id='portal_sale_content']" position="inside">
+            <t t-if="sale_order.state in ('sale', 'done') and sale_order.payment_schedule_lines">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6 class="mb-3">
+                            <i class="fa fa-calendar"/>
+                            <strong>Detalle de Cuotas</strong>
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Cuota N°</th>
+                                        <th>Vencimiento</th>
+                                        <th class="text-end">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="sale_order.payment_schedule_lines" t-as="line">
+                                        <tr>
+                                            <td>Cuota <t t-esc="line.installment_number"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.due_date"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>
+                                                    <span t-field="line.amount" t-options='{"widget": "monetary", "display_currency": sale_order.currency_id}'/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <th colspan="2" class="text-end">Total:</th>
+                                        <th class="text-end">
+                                            <strong>
+                                                <span t-field="sale_order.payment_schedule_total" t-options='{"widget": "monetary", "display_currency": sale_order.currency_id}'/>
+                                            </strong>
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+        <xpath expr="//t[@t-call='portal.portal_record_sidebar']/t[@t-set='classes']" position="replace">
+            <t t-set="classes" t-value="'col-lg-4 col-xxl-3 d-print-none d-none'"/>
+        </xpath>
+        <xpath expr="//div[@name='sale_order_actions']//a[contains(@class,'btn-danger')]" position="replace"/>
+        <xpath expr="//div[@name='sale_order_actions']//a[contains(@class,'btn-primary')]" position="replace">
+            <div id="accept_button_container">
+                <t t-if="sale_order.payment_term_id or sale_order.payment_schedule_lines">
+                    <a role="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalaccept" href="#" id="accept_button">
+                        <i class="fa fa-check"/>
+ Aceptar y Firmar
+                    </a>
+                </t>
+                <t t-else="">
+                    <button type="button" class="btn btn-primary disabled" disabled="disabled" title="Debe seleccionar un plan de pago primero">
+                        <i class="fa fa-lock"/>
+ Aceptar y Firmar
+                    </button>
+                </t>
+            </div>
+        </xpath>
+        <xpath expr="//div[@id='portal_sale_content']" position="inside">
+            <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                const paymentTermSelector = document.getElementById('payment_term_selector');
+                if (paymentTermSelector) {
+                    paymentTermSelector.addEventListener('change', function(event) {
+                        const termId = event.target.value;
+                        const orderId = document.querySelector('input[name="order_id"]').value;
+                        const accessToken = document.querySelector('input[name="access_token"]').value;
+                        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+                        fetch(`/my/orders/${orderId}/update_payment_term`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-Token': csrfToken
+                            },
+                            body: JSON.stringify({
+                                jsonrpc: "2.0",
+                                params: {
+                                    term_id: termId,
+                                    access_token: accessToken
+                                }
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => { 
+                            if (data.result &amp;&amp; data.result.success) {
+                                // Recargar la página para ver los cambios
+                                window.location.reload();
+                            } else {
+                                console.error('Error updating payment term:', data.result ? data.result.error : 'Unknown error');
+                                alert('Error al actualizar el plan de pago. Por favor, intente nuevamente.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch error:', error);
+                            alert('Error de conexión. Por favor, intente nuevamente.');
+                        });
+                    });
+                }
+            });
+            </script>
+        </xpath>
+    </template>
+</odoo>

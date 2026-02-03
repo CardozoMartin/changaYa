@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_contract_page" name="Contrato">
+        <t t-call="portal.portal_layout">
+            <t t-set="o" t-value="sale_order"/>
+            <t t-set="page_name" t-value="'Contrato'"/>
+            
+            <div class="container mt-4">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="my-0">Contrato de Servicios</h2>
+                            <div t-if="sale_order.contract_signature" class="badge bg-success p-2" style="font-size: 1rem;">
+                                <i class="fa fa-check-circle"/> Firmado
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <!-- Dispatch logic similar to report -->
+                        <div class="contract-content p-4 mb-4" style="background-color: white;">
+                            <t t-if="sale_order.company_id.id == 1">
+                                <t t-set="doc" t-value="sale_order"/>
+                                <t t-call="insurance_api.contract_body_company_tucuman"/>
+                            </t>
+                            <t t-elif="sale_order.company_id.id == 2">
+                                <t t-set="doc" t-value="sale_order"/>
+                                <t t-call="insurance_api.contract_body_company_cordoba"/>
+                            </t>
+                            <t t-elif="sale_order.company_id.id == 3">
+                                <t t-set="doc" t-value="sale_order"/>
+                                <t t-call="insurance_api.contract_body_company_nacional"/>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-warning">
+                                    No se encontró una plantilla de contrato configurada para la compañía <t t-esc="sale_order.company_id.name"/>.
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-end">
+                            <t t-if="sale_order.contract_signature">
+                                <div class="text-end text-success border border-success rounded p-3 bg-white">
+                                    <p class="mb-1"><i class="fa fa-lock"/> <strong>Firmado Digitalmente</strong></p>
+                                    <p class="mb-1 small">Por: <span t-field="sale_order.contract_signed_by"/></p>
+                                    <div class="mt-2">
+                                        <img t-att-src="image_data_uri(sale_order.contract_signature)" style="max-height: 50px;"/>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <a role="button" class="btn btn-secondary btn-lg me-2" id="printContractBtn">
+                                    <i class="fa fa-print"/> Imprimir Contrato
+                                </a>
+                                <a role="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalaccept_contract" href="#">
+                                    <i class="fa fa-pen-nib"/> Aceptar y Firmar Contrato
+                                </a>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div role="dialog" class="modal fade" id="modalaccept_contract">
+                <div class="modal-dialog">
+                    <form id="accept_contract_form" method="POST" t-att-action="'/my/contract/%s/sign' % sale_order.id" enctype="multipart/form-data" class="js_accept_json modal-content js_website_submit_form">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="access_token" t-att-value="sale_order.access_token"/>
+                        
+                        <header class="modal-header">
+                            <h4 class="modal-title">Firmar Contrato</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </header>
+                        <main class="modal-body" id="sign-dialog">
+                            <p>
+                                Al firmar, acepto los términos y condiciones expresados en el contrato adjunto.
+                            </p>
+                            <t t-call="portal.signature_form">
+                                <t t-set="call_url" t-value="'/my/contract/%s/sign' % sale_order.id"/>
+                                <t t-set="default_name" t-value="sale_order.partner_id.name"/>
+                            </t>
+                        </main>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Script para imprimir -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var printBtn = document.getElementById('printContractBtn');
+                    if (printBtn) {
+                        printBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            // Configurar título de página vacío
+                            var originalTitle = document.title;
+                            document.title = ' ';
+                            
+                            // Imprimir
+                            window.print();
+                            
+                            // Restaurar título
+                            setTimeout(function() {
+                                document.title = originalTitle;
+                            }, 100);
+                        });
+                    }
+                });
+            </script>
+        </t>
+    </template>
+
+    <!--Email para enviar el link del contrato -->
+    <data noupdate="1">
+        <record id="email_contract_signature" model="mail.template">
+            <field name="name">Envío Enlace para Firma del Contrato</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Enlace para la Firma del Contrato</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>
+                        Estimado/a <t t-out="object.partner_id.name or ''"/>,
+                    </p>
+                        <br/>
+                    <p>
+                        Le envío el enlace correspondiente a la firma en línea del contrato relacionado con su Orden de Venta.
+                    </p>
+                        <br/>
+                    <p>
+                        Por favor, revisa el documento y procede a firmarlo a la brevedad posible.
+                    </p>
+                        <br/>
+                        <div style="text-align: left; margin: 5px 0px 5px 0px;">
+                            <a t-attf-href="{{ object.get_base_url() }}{{ object.get_contract_portal_url() }}"
+                                style="background-color: #b211a2ff; padding: 12px 24px; text-decoration: none; color: #ffffffff; border-radius: 5px; font-size: 14px; font-weight: bold;">
+                                Ver y Firmar Contrato
+                            </a>
+                        </div>
+                        <br/><br/>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

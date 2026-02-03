@@ -1,9 +1,7 @@
-import { HapticTab } from '@/components/haptic-tab';
-import { Colors } from '@/constants/theme';
 import { useAuthSessionStore } from '@/store/authSessionStore';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Tabs, useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
@@ -16,19 +14,6 @@ import { queryClient } from '@/lib/queryClient';
 
 function RootContent() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const schemeKey = (colorScheme ?? 'light') as 'light' | 'dark';
-  const router = useRouter();
-  const token = useAuthSessionStore((s) => s.token);
-  const rehydrated = useAuthSessionStore((s) => s.rehydrated);
-
-  // Si la store ya se rehidrató y no hay token, forzamos ir a auth
-  // Esto evita que la app muestre las tabs cuando no hay sesión activa
-  useEffect(() => {
-    if (rehydrated && !token) {
-      router.replace('/auth/LoginScreen');
-    }
-  }, [rehydrated, token, router]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -36,60 +21,14 @@ function RootContent() {
       {insets.top > 0 && (
         <View style={{ height: insets.top, backgroundColor: '#FFFFFF' }} />
       )}
-      <Tabs
-        tabBar={(props:any) => {
-          // map current route to our menu's activeTab key
-          const routeName = props.state?.routes?.[props.state.index]?.name;
-
-          // Ocultar el BottomMenu en pantallas donde no queremos el menú inferior
-          const hiddenScreens = ['CompleteProfileScreen', 'OnboardingScreen', 'TermsAndPrivacyScreen'];
-          if (hiddenScreens.includes(routeName)) {
-            return null;
-          }
-
-          const mapToKey = (name: string) => {
-            if (name === 'HomeScreen') return 'home';
-            if (name === 'OpportunitiesScreen') return 'search';
-            if (name === 'ProfileScreen') return 'profile';
-            return 'home';
-          };
-
-          // Handler for tab presses
-          const handlePress = (key: 'home' | 'search' | 'create' | 'messages' | 'profile') => {
-            if (key === 'home') props.navigation.navigate('HomeScreen');
-            else if (key === 'search') props.navigation.navigate('OpportunitiesScreen');
-            else if (key === 'profile') props.navigation.navigate('ProfileScreen');
-            else if (key === 'create') props.navigation.navigate('PublishJobScreen');
-            else if (key === 'messages') props.navigation.navigate('HomeScreen');
-          };
-
-          const BottomMenu = require('./menu').default;
-          return <BottomMenu activeTab={mapToKey(routeName)} onTabPress={handlePress} />;
-        }}
-        screenOptions={{
-          tabBarActiveTintColor: Colors[schemeKey].tint,
-          headerShown: false,
-          tabBarButton: HapticTab,
-        }}>
-        <Tabs.Screen
-          name="HomeScreen"
-          options={{
-            title: 'Home'
-          }}
-        />
-        <Tabs.Screen
-          name="OpportunitiesScreen"
-          options={{
-            title: 'Explore'
-          }}
-        />
-        <Tabs.Screen
-          name="ProfileScreen"
-          options={{
-            title: 'Perfil'
-          }}
-        />
-      </Tabs>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="Splashscreen" options={{ headerShown: false }} />
+        <Stack.Screen name="LoginScreen" options={{ headerShown: false }} />
+        <Stack.Screen name="RegisterScreen" options={{ headerShown: false }} />
+        <Stack.Screen name="verifyAccounts" options={{ headerShown: false }} />
+        <Stack.Screen name="WelcomeScreen" options={{ headerShown: false }} />
+      </Stack>
       {/* Safe Area Bottom - Barra oscura para botones del sistema */}
       {insets.bottom > 0 && (
         <View style={{ height: insets.bottom, backgroundColor: '#1E1E1E' }} />
@@ -167,8 +106,8 @@ function AppLoader({ children }: { children: any }) {
 
   // Mientras showInAppSplash es true mostramos el componente Splashscreen
   if (showInAppSplash) {
-    // Importar dinámicamente el componente desde el layout público (auth)
-    const AppSplash = require('../auth/Splashscreen').default;
+    // Importar dinámicamente el componente para evitar conflictos de nombres
+    const AppSplash = require('./Splashscreen').default;
     return (
       <AppSplash
         onFinish={() => {

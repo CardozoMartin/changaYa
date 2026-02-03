@@ -1,0 +1,1368 @@
+<odoo>
+    <template id="contract_body_company_tucuman">
+        <div class="page contract">
+            <t t-set="client_signature_url" t-value="image_data_uri(doc.signature_thumb) if doc.signature_thumb else ''"/>
+            <style> @page { size: A4; margin: 2cm 2cm 3cm 3cm; @bottom-center { content: "Página "
+                counter(page) " de " counter(pages); font-size: 10pt; color: #000; } @bottom-left {
+                content: url("/insurance_api/static/src/img/firma-rep-tuc-foot.png"); max-height:
+                75px; padding-left: 1cm; } @bottom-right { content: url("<t
+                    t-esc='client_signature_url' />"); padding-right: 1cm;}
+                p { orphans: 3; widows: 3; } } </style>
+            <t t-call="insurance_api.contract_styles" />
+
+            <section>
+                <t t-foreach="doc.partner_id.child_ids" t-as="contact">
+                    <t
+                        t-if="contact.category_id.filtered(lambda c: c.name == 'Representante Legal')">
+                        <t t-set="rep_contact" t-value="contact" />
+                    </t>
+                </t>
+
+                <div>
+                    <h4 class="contract-title">
+                        CONTRATO DE PRESTACIÓN DE SERVICIOS MÉDICOS DE ACCIDENTOLOGÍA ESTUDIANTIL
+                    </h4>
+                </div>
+                <p>En la ciudad de San Miguel de Tucumán, a los <strong>
+                        <t
+                            t-esc="(doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%d')" />
+                    </strong>
+                    días del mes de <strong>
+                        <t
+                            t-esc="{'January': 'enero', 'February': 'febrero', 'March': 'marzo', 'April': 'abril', 'May': 'mayo', 'June': 'junio', 'July': 'julio', 'August': 'agosto', 'September': 'septiembre', 'October': 'octubre', 'November': 'noviembre', 'December': 'diciembre'}.get((doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%B'), (doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%B'))" />
+                    </strong>
+                    de <strong>
+                        <t
+                            t-esc="(doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%Y')" />
+                    </strong>
+                    , entre el establecimiento educativo, <strong>
+                        <t
+                            t-esc="doc.partner_id.parent_id.name if doc.partner_id.parent_id else doc.partner_id.name" />
+                    </strong>
+                    .con domicilio en <strong>
+                        <t
+                            t-esc="(doc.partner_id.parent_id.street if doc.partner_id.parent_id else doc.partner_id.street)" />
+                    </strong>
+                    .de la ciudad de <strong>
+                        <t
+                            t-esc="(doc.partner_id.parent_id.city if doc.partner_id.parent_id else doc.partner_id.city)" />
+                    </strong>
+                    , Tel. <strong>
+                        <t
+                            t-esc="(doc.partner_id.parent_id.phone if doc.partner_id.parent_id else doc.partner_id.phone) or '……………………………………'" />
+                    </strong>
+                    , CUIT Nº <strong>
+                        <t
+                            t-esc="(doc.partner_id.parent_id.vat if doc.partner_id.parent_id else doc.partner_id.vat) or '……………………………………'" />
+                    </strong>
+                    , E-Mail: <strong>
+                        <t
+                            t-esc="(doc.partner_id.parent_id.email if doc.partner_id.parent_id else doc.partner_id.email) or '……………………………………'" />
+                    </strong>
+                    <t
+                        t-set="legal_rep"
+                        t-value="doc.partner_id.child_ids.filtered(lambda c: any(cat.name == 'Representante Legal' for cat in c.category_id))" />
+                    . <t t-if="legal_rep">Representado en este acto por <t t-esc="legal_rep[0].name" />
+                    DNI N° <t t-esc="doc.legal_representative_dni" />
+                    </t>
+                    <t
+                        t-elif="any(cat.name == 'Representante Legal' for cat in doc.partner_id.category_id)">
+                    Representado en este acto por <t t-esc="doc.partner_id.name" /> DNI N° <t
+                            t-esc="doc.legal_representative_dni" />
+                    </t> en su
+                    carácter de <t t-if="rep_contact">
+                        <span t-if="rep_contact.title" t-esc="rep_contact.title.name" />
+                        <span t-if="not rep_contact.title">Representante Legal</span>
+                    </t>
+                    <t
+                        t-elif="any(cat.name == 'Representante Legal' for cat in doc.partner_id.category_id)">
+                        <span t-if="doc.partner_id.title" t-esc="doc.partner_id.title.name" />
+                        <span t-if="not doc.partner_id.title">Representante Legal</span>
+                    </t>
+                    y autorizado para la celebración del presente contrato, en adelante el
+                    ESTABLECIMIENTO, por una parte y por la otra COMFYE SRL., C.U.I.T.
+                    30-65906905-5, con domicilio legal en calle Laprida 637 de la ciudad de San
+                    Miguel de Tucumán, E-mail: marianamatias@comfye.com.ar, representada en este
+                    acto por su gerente Sra. Mariana del Valle Matías, D.N.I. Nº 23.117.016, en
+                    adelante la PRESTADORA y/o COMFYE, acuerdan celebrar el presente Contrato de
+                    Prestación de Servicios Médicos de accidentología estudiantil, el que se regirá
+                    por las siguientes cláusulas y condiciones: </p>
+                <!-- con emergencias -->
+                <section>
+                    <div class="section-title">
+                        CLÁUSULA Nº 1: DEFINICIONES.
+                    </div>
+                    <p>1) ALUMNOS: Aquellas personas que consten en los registros del
+                        Establecimiento en tal
+                        carácter y cuyo nombre se haya incluido en la nómina de alumnos remitidos a
+                        la
+                        prestadora.
+                    </p>
+                    <p>2) ACCIDENTES ESTUDIANTILES: Se consideran tales los daños causados o
+                        sufridos por los
+                        alumnos menores, aun de nivel superior o universitario, y/o mayores a nivel
+                        secundario,
+                        en los casos en que expresamente se los incluya (durante alguna actividad
+                        curricular o
+                        extracurricular, siempre y cuando se encuentren bajo el control de la
+                        autoridad
+                        educativa). Por daño sufrido se entiende la lesión corporal que pueda ser
+                        determinada
+                        por los médicos de una manera cierta, sufridos por los alumnos
+                        independientemente de su
+                        voluntad, sea por la acción repentina y violenta de, o con, un agente
+                        externo, sea por
+                        esfuerzo repentino y evidente al diagnóstico, ocurridos en ocasión de la
+                        actividad
+                        educativa en el establecimiento o en las ubicaciones de riesgo y actividades
+                        declaradas,
+                        hallándose bajo el control de la autoridad educativa.
+                    </p>
+                    <p>3) ACCIDENTE IN ITINERE: Es el que se produce en el trayecto normal y
+                        habitual que realiza el alumno/a desde su domicilio hacia el establecimiento
+                        y viceversa, en el medio habitual de transporte, con una hora de
+                        anterioridad y una hora de posterioridad al inicio y finalización de la
+                        jornada escolar. Es por ello que cuando el alumno/a se matricula en la
+                        institución educativa, su padre/madre o tutor tiene que declarar cuál es el
+                        domicilio del alumno en carácter de declaración jurada, a los efectos de la
+                        aplicación de la presente cláusula. Las condiciones de esta cobertura se
+                        encuentran reguladas por los términos y condiciones conforme <strong>ANEXO
+                            II - Accidentes in
+                            itinere
+                        </strong>
+                        . </p>
+                    <p>4) UBICACIONES DE RIESGOS: Son todos los domicilios declarados por la
+                        institución,
+                        donde los alumnos desarrollan actividades programáticas o
+                        extra-programáticas
+                        supervisados por los docentes.
+                    </p>
+                    <p>5) ACTIVIDADES EDUCATIVAS: Son aquéllas incluidas en el Plan Oficial de
+                        Estudios de la
+                        Institución, autorizadas por el Ministerio de Educación de la Provincia y/o
+                        Nación, como
+                        así también aquellas incluidas en el Proyecto Educativo institucional,
+                        realizados en los
+                        lugares declarados como ubicaciones de riesgo o en otros domicilios (en caso
+                        de que se
+                        declaren) siempre que las mismas estuvieran supervisadas por personal del
+                        establecimiento y reúnan los requisitos establecidos del presente contrato.
+                        También se
+                        consideran actividades educativas las prácticas estudiantiles que reúnan los
+                        requisitos
+                        establecidos en el Anexo III Inc. IX del presente contrato.
+                    </p>
+                    <p>6) SERVICIOS INCLUIDOS: Son los mencionados en la cláusula número dos.</p>
+                    <p>7) EXCLUSIONES: Son aquellos que no se encuentran incluidos en la cláusula 2
+                        y
+                        específicamente los que se mencionan en el Anexo número I.
+                    </p>
+                    <p>8) ENFERMEDAD PREEXISTENTE: Corresponde a cualquier enfermedad, patología o
+                        condición
+                        de salud que haya sido conocida o no por el afiliado, diagnosticada
+                        médicamente con
+                        anterioridad a la suscripción del contrato. Como así también aquella que es
+                        diagnosticada médicamente durante un tratamiento motivado por un accidente
+                        sufrido por
+                        el beneficiario. Se especifican condiciones conforme ANEXO IV.
+                    </p>
+                    <p>9) LÍMITE DE SERVICIOS: Es el monto dinerario o prestaciones máximas a cubrir
+                        por
+                        parte la PRESTADORA y que se especifican en Cláusula 2.2.C.
+                    </p>
+                    <p>10) NORMATIVA APLICABLE: Las disposiciones del presente contrato, sus
+                        condiciones
+                        particulares, que se suscriben como anexos I, II, III y IV, como así también
+                        en lo
+                        pertinente lo dispuesto en los arts. 1251 y cc. Y el Art. 1767 y cc. del
+                        CCCN.
+                    </p>
+                    <p>11) CONSULTAS MÉDICAS ORIENTATIVAS O TELEMEDICINA: Es el servicio médico
+                        asistencial
+                        pre hospitalario de atención de crisis de salud que no reviste gravedad,
+                        resultando a
+                        priori innecesario el traslado del paciente, pero que requiere atención
+                        médica
+                        orientativa.
+                    </p>
+                    <!-- CON EMERGENCIAS -->
+                    <div t-if="doc.emergencies">
+                        <p>12) EMERGENCIA MÉDICA: Son aquellas situaciones en la cual existe riesgo
+                            de muerte
+                            potencial para la persona, en caso de no actuar de manera inmediata y
+                            adecuada,
+                            derivadas de accidentes escolares.
+                        </p>
+                        <p>13) URGENCIA MÉDICA: Es aquella situación que requiere intervención
+                            médica pronta,
+                            en la cual, la vida no está en riesgo inminente, pero requiere la
+                            asistencia de un
+                            profesional médico.
+                        </p>
+                        <p>14) URGENCIAS MÉDICAS NO DERIVADA DE ACCIDENTES ESTUDIANTILES: Son
+                            aquellas que NO
+                            derivan o tiene su causa en Accidente estudiantil, pero que por su
+                            severidad requiere
+                            la asistencia inmediata del servicio de emergencia hasta la
+                            estabilización del
+                            paciente para su correspondiente derivación, ya en presencia del
+                            padre/madre,
+                            responsable y/o tutor/a del alumno.
+                        </p>
+                        <p>15) ÁREA PROTEGIDA MÉDICA: Es un servicio que permite proteger la Salud
+                            de
+                            colaboradores, proveedores y visitantes de un espacio determinado o área
+                            designada
+                            como área protegida ante una eventual Urgencia o Emergencia Médica que
+                            se presente. El
+                            servicio ofrece asistencia médica y servicio de ambulancia a toda la
+                            población
+                            flotante que se encuentra dentro de esa Zona Protegida. Es un servicio
+                            principalmente
+                            dirigido a Organizaciones, Empresas, Negocios, Instituciones, Jardines y
+                            Colegios
+                            quienes diariamente reciben un número importante de personas dentro de
+                            sus
+                            instalaciones y en donde ante una eventual urgencia o emergencia que se
+                            presente,
+                            reciben orientación médica Virtual o Telefónica y Traslado Asistencial
+                            si fuera
+                            necesario al establecimiento médico asistencial que se indique en
+                            Ambulancia si el
+                            caso lo requiere, para preservar la Salud de la persona.
+                        </p>
+                    </div>
+                </section>
+                <p>
+                    <strong>CLÁUSULA Nº 2: OBLIGACIONES DE LA PRESTADORA:</strong> SERVICIOS A
+                    PRESTAR: La PRESTADORA se compromete, a prestar los servicios médicos
+                    asistenciales de la llamada ”accidentología estudiantil”, en las condiciones,
+                    modalidades y limitaciones mencionadas más abajo. Es decir, los accidentes
+                    estudiantiles causados y/o sufridos por los alumnos regulares del
+                    ESTABLECIMIENTO, en ocasión de la actividad educativa programática o extra
+                    programática , en los lugares declarados por éste como de ubicación de riesgo, o
+                    fuera del mismo, siempre que se encuentren bajo el control de la autoridad
+                    educativa, y no fueran causados por un caso fortuito ajeno al riesgo propio de
+                    la actividad, acorde a las disposiciones del presente contrato, sus condiciones
+                    particulares, que se suscriben como anexos I, II y III, como así también en lo
+                    pertinente a lo dispuesto por ellos arts. 1251 y cc. Y . 1767 del CCCN. Se
+                    amplían los servicios a los alumnos de nivel superior y universitario, si
+                    correspondiere </p>
+                <p>
+                    <strong>2.1. SERVICIOS INCLUIDOS: MODALIDAD EN LA PRESTACIÓN DEL SERVICIO</strong>
+                    Comfye cuenta con un sistema de Prestación Médica Directa para los Alumnos
+                    Matriculados, a fin de asistir las Urgencias y Emergencias derivadas de los
+                    Accidentes estudiantiles Los servicios que se incluyen dentro del presente
+                    contrato son los siguientes: </p>
+                <p>
+                    <strong>2.2. Asistencia médica y farmacéutica integral reparadora</strong>
+                </p>
+                <p>A) Asistencia médica y farmacéutica: El alumno/a recibirá todo lo necesario para
+                    la
+                    resolución de la emergencia y/o urgencia, derivadas de accidentes estudiantiles:
+                    v.g.
+                    consultas médicas, honorarios médicos, prácticas especializadas, internaciones,
+                    cirugías,
+                    terapia intensiva, materiales de osteosíntesis, material descartable,
+                    rehabilitación,
+                    medicamentos, etc. hasta los límites expresados en la cláusula 2.2.C. Las
+                    prestaciones
+                    serán realizadas.
+                </p>
+                <p>B) en el Centro Médico Comfye y por los Prestadores adheridos a la Red COMFYE,
+                    reservándose la empresa el derecho a modificar o ampliar la misma. En todo caso
+                    se les notificará al Establecimiento educativo a través de la página Web de la
+                    prestadora. Todas las prestaciones se realizarán en forma directa en nuestra red
+                    de prestadores, con la sola presentación de la Denuncia de Accidente, sin
+                    desembolso de dinero por parte de la institución educativa o de los padres o
+                    representantes del menor. En el caso de que los padres (o representantes) del
+                    menor accidentado desearan derivarlo a otro prestador no adherido a la Red, la
+                    PRESTADORA reconocerá hasta el valor que hubiera pagado a su propio prestador,
+                    conforme valor del nomenclador vigente al momento de contratarse la prestación,
+                    liberándose la Prestadora de toda responsabilidad por el servicio asistencial
+                    efectuado por dicho prestador. La Red de Prestadores y metodología de uso de
+                    servicio se encuentra disponible en el sitio web <a>www.comfye.com</a> y
+                    cualquier duda pueden comunicarse al 0810 444 0124 y/o al Nº 381 554 5154. </p>
+                <p>C) Límite de Monto de las Prestaciones: El Límite del monto de las prestaciones
+                    de los servicios médicos asistenciales (médicos , paramédicos y farmacéuticos)
+                    es: 1) Por todos los alumnos y por todos los accidentes hasta pesos <t
+                        t-esc="doc.insured_amount * doc.assistance_limit"
+                        t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                    ( <t t-esc="doc._amount_to_words(doc.insured_amount * doc.assistance_limit)" />
+                    ); 2) Por accidente y por alumno hasta un monto máximo de pesos <t
+                        t-esc="doc.insured_amount * doc.events_limit"
+                        t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                    ( <t t-esc="doc._amount_to_words(doc.insured_amount * doc.events_limit)" /> );
+                    3) En caso de que el accidente requiera intervención quirúrgica que demande
+                    material de osteosíntesis, el mismo será siempre de Origen NACIONAL, sin
+                    excepción. Los padres y/o representantes podrán a su cargo y costo adquirir
+                    material importado. En tal caso Comfye reconocerá hasta el valor del material
+                    nacional. 4) En caso de pluralidad de damnificados la suma máxima en concepto de
+                    prestaciones médicas por evento no podrá superar en ningún caso pesos: <t
+                        t-esc="doc.insured_amount * doc.assistance_limit"
+                        t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                    ( <t t-esc="doc._amount_to_words(doc.insured_amount * doc.assistance_limit)" />
+                    ), con un sub límite de hasta pesos <t
+                        t-esc="doc.insured_amount * doc.events_limit"
+                        t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                    ( <t t-esc="doc._amount_to_words(doc.insured_amount * doc.events_limit)" /> )
+                    por damnificado. </p>
+                <p>C.1) Si el damnificado O SUS REPRESENTANTES iniciarán reclamo extrajudicial,
+                    prejudicial
+                    o Judicial durante el tratamiento médico, Y QUE TENGAN POR OBJETO EJERCER
+                    PRETENSIONES
+                    INDEMNIZATORIAS de cualquier naturaleza derivado de un accidente estudiantil,
+                    sea en
+                    contra del establecimiento y su aseguradora y/o comfye, éste SE RESERVA EL
+                    DERECHO A
+                    DISCONTINUAR LOS SERVICIOS DE ASISTENCIA MÉDICA FARMACÉUTICA, siempre que no
+                    hubiera
+                    riesgo de vida.
+                </p>
+                <p>C.2) PRIMERA ATENCIÓN: CAUSA AJENA - En caso de que se constatara que la
+                    necesidad de
+                    servicios médicos está causada por una causa ajena a la accidentología
+                    estudiantil o se
+                    trata de una dolencia y/o enfermedad preexistente, Comfye se reserva el derecho
+                    a
+                    discontinuar la atención médica, a pesar de haber brindado LA ATENCIÓN MÉDICA
+                    PROFESIONAL.
+                    En tal caso EL SERVICIO podrá ser SUSPENDIDO, EN LOS TÉRMINOS DEL ANEXO I “DE
+                    LAS
+                    EXCLUSIONES”, CLÁUSULA 1.26.
+                </p>
+                <p>2.3. Servicio de Emergencias Médicas y Urgencias: Conforme disponibilidad de la
+                    región.
+                    En caso de contratación expresa del servicio, las condiciones se convienen
+                    conforme ANEXO
+                    V.
+                </p>
+                <p>2.4. Atención Administrativa y Comercial: Se realizará en las oficinas ubicadas
+                    en calle
+                    Laprida 637. San Miguel de Tucumán. Provincia de Tucumán.
+                </p>
+                <p t-if="doc.emergencies">2.5. Sistema de Trámites On Line: La Empresa se obliga a
+                    brindar al Establecimiento, uno o varios usuarios y contraseñas (según
+                    corresponda) para acceder al sistema de autogestión. El mismo se pone a
+                    disposición a través del portal de la Empresa en: <a>www.comfye.com.ar</a> . </p>
+                <p>
+                    <strong>CLÁUSULA Nº 3: OBLIGACIONES DEL ESTABLECIMIENTO.</strong>
+                </p>
+                <p>
+                    <strong>3.1</strong> PRECIO DE LOS SERVICIOS CONTRATADOS: El ESTABLECIMIENTO
+                    deberá abonar a la PRESTADORA, como contraprestación por las obligaciones por
+                    ella asumida, y tomando en consideración el número de alumnos referido por el
+                    establecimiento, a la fecha, el importe anual de (*) <strong>
+                        <span t-field="doc.payment_schedule_total"
+                            t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                    ( <t t-esc="doc._amount_to_words(doc.payment_schedule_total)" /> ) </strong> .
+                    Estos precios incluyen IVA (10.5%). Dicho precio será abonado de la manera que
+                    se menciona en 3.2. Sin perjuicio de lo manifestado, el importe total será
+                    determinado en forma definitiva luego de la presentación de listados de los
+                    alumnos del ESTABLECIMIENTO, (según cláusula Nº 1 del Anexo III: Condiciones
+                    Particulares). </p>
+                <p>
+                    <strong>3.2</strong> El importe de cada una de las cuotas referidas
+                    anteriormente en 3.1 deberá ser abonado por el ESTABLECIMIENTO a la PRESTADORA
+                    por mes adelantado del 1 al 10 de cada mes en el domicilio de esta última, o
+                    donde ella lo indique según los siguientes vencimientos: </p>
+                <t t-if="doc.payment_schedule_lines and len(doc.payment_schedule_lines) &gt;= 1">
+                    <table class="table table-bordered contract-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left">FECHA</th>
+                                <th style="text-align: left">CUOTA</th>
+                                <th style="text-align: left">PRECIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="doc.payment_schedule_lines" t-as="line">
+                                <tr>
+                                    <td style="text-align: left">
+                                        <span t-field="line.due_date" />
+                                    </td>
+                                    <td style="text-align: right">
+                                        <t t-esc="line.installment_number" />
+                                    </td>
+                                    <td style="text-align: right">
+                                        <span t-field="line.amount"
+                                            t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+                <p>
+                    <strong>3.3.</strong> En virtud del proceso inflacionario que vive el país,
+                    ambas partes contratantes acuerdan que si el valor de las prestaciones médicas,
+                    asistenciales, farmacéuticas se tornaran excesivamente oneroso para la
+                    PRESTADORA, considerándose en particular configurada tal situación si dicho
+                    incremento fuera superior en un 20% al acordado en el presupuesto presentado por
+                    Comfye para el periodo lectivo 2026, año de ejecución del presente contrato,
+                    ambas partes de común acuerdo procurarán, conforme al principio de buena fe,
+                    restablecer el equilibrio de las prestaciones en forma equitativa, teniendo en
+                    consideración a tal fin especialmente la variación del costo que hubieran
+                    experimentado las prestaciones antes mencionadas. Si no hubiera acuerdo de
+                    partes, se tomará como base el índice de incremento que informe la
+                    Superintendencia de Servicios de Salud de la Nación. Si el incremento no fuera
+                    aceptado por el contratante y sin perjuicio de lo dispuesto por el art. 1091 del
+                    CCCN, tal situación será causal de rescisión del contrato por parte de la
+                    PRESTADORA, sin que ello genere derecho a resarcimiento o indemnización alguna a
+                    favor de la otra parte. Asimismo, en caso de rescisión del contrato por parte
+                    del Establecimiento, dicha rescisión no generará derecho a resarcimiento o
+                    indemnización alguna a favor de la prestadora, debiendo abonar aquél hasta la
+                    última cuota del mes en curso. A este fin, se tomará el precio pactado y se lo
+                    dividirá en 10 meses, para obtener la parte proporcional del precio que se
+                    deberá cancelar. En caso de que se haya adelantado el precio anual, se dividirá
+                    el mismo en 10 y por el remanente al tiempo que resta trascurrir, el precio
+                    proporcional, será restituido a los 60 días de rescindido el contrato sin
+                    incremento o actualización de ningún tipo, descontando un 20% en concepto de
+                    costos administrativos. </p>
+                <p>
+                    <strong>3.4.</strong> Vencidos los plazos fijados para el pago del precio de la
+                    contraprestación a cargo del ESTABLECIMIENTO, con las modalidades establecidas
+                    en 3.1 y 3.2, y sin que el mismo se hubiera cancelado en los plazos previstos,
+                    la PRESTADORA notificará por escrito y en forma fehaciente en el domicilio
+                    constituido por el ESTABLECIMIENTO en el presente contrato o al e-mail
+                    declarado, la mora acontecida y fijará un plazo de diez (10) días corridos para
+                    la cancelación del importe adeudado, plazo que se contarán a partir de la hora
+                    cero (0) del día siguiente a la fecha de recepción de la notificación
+                    mencionada. Vencido dicho plazo, la PRESTADORA automáticamente suspenderá el
+                    cumplimiento de las obligaciones asumidas por ella bajo el presente contrato, a
+                    partir de la hora cero (0) del día siguiente, sin perjuicio de reclamar
+                    judicialmente el cobro de lo adeudado con más sus intereses, gastos y costas. </p>
+                <p>
+                    <strong>3.5.</strong> Cálculo para el pago fuera de término: las cuotas abonadas
+                    después del vencimiento devengarán un interés de 5% mensual capitalizable
+                    mensualmente. </p>
+                <p>
+                    <strong>3.6.</strong> A partir de tal momento, EL ESTABLECIMIENTO, dentro de los
+                    siete días de la suspensión, podrá solicitar por escrito y en forma fehaciente a
+                    LA PRESTADORA la rehabilitación de los servicios, abonando los importes
+                    adeudados con más sus intereses y gastos. La rehabilitación de las prestaciones
+                    surtirá efecto a partir de la hora cero (0) del día siguiente al pago. LA
+                    PRESTADORA percibirá el pago de los importes vencidos, sin que ello implique
+                    obligaciones a su cargo respecto al período en que se encontraban suspendidas
+                    las prestaciones. </p>
+                <p>
+                    <strong>3.7.</strong> Vencido el plazo de siete (7) días fijado en 3.6 para que
+                    el establecimiento solicite la rehabilitación de las prestaciones, el presente
+                    contrato se considera automáticamente rescindido de pleno derecho por culpa del
+                    ESTABLECIMIENTO, sin perjuicio del derecho de la PRESTADORA de reclamar el cobro
+                    de los importes adeudados como así también los daños y perjuicios derivados de
+                    tal incumplimiento. </p>
+                <p>
+                    <strong>3.8.</strong> OTRAS OBLIGACIONES DEL ESTABLECIMIENTO:. </p>
+                <p>
+                    <strong>3.8.1</strong> El ESTABLECIMIENTO se obliga a informar a los padres o
+                    representantes de los beneficiarios (alumnos/as) y a éstos las condiciones,
+                    modalidades y límites de los servicios contratados a Comfye, en el contrato de
+                    enseñanza y/o a través de su página web o a través de otro medio comunicante que
+                    garantice la comprensión de la información de conformidad al Art. 4° de la ley
+                    24.240 t.o. y al Art. 1100 del CCCN. A estos efectos Comfye proveerá a los
+                    establecimientos de las piezas comunicativas para su correspondiente publicación
+                    por parte del Establecimiento, aclarando en todo momento de que la prestadora no
+                    es una compañía de seguros, sino una empresa privada que presta los llamados
+                    servicios de accidentología estudiantil. </p>
+                <p>
+                    <strong>3.8.2.</strong> El establecimiento deberá denunciar a la PRESTADORA los
+                    accidentes que se produzcan en el desarrollo de la actividad educativa a la
+                    brevedad, dentro de un plazo máximo de 72 hs. corridas, de producidos los
+                    mismos. </p>
+                <p>
+                    <strong>3.8.3.</strong> El establecimiento deberá, (incluidos propietarios,
+                    directivos y docentes) asumir el compromiso de cumplir con normas básicas de
+                    higiene, seguridad y deber de prevención del daño (conforme al art. 1710 del
+                    CCCN) para los educandos durante el desarrollo de la actividad educativa y las
+                    medidas que expresamente recomiende por escrito la PRESTADORA o la autoridad
+                    educativa. </p>
+
+                <p>
+                    <strong>3.8.4.</strong> El establecimiento deberá Aceptar en todos sus términos
+                    los a) controles administrativos de verificación del siniestro: lugar, hora,
+                    datos personales del accidentado consignados en la denuncia, datos personales de
+                    docentes o no docentes que supervisan la actividad, b) controles de auditoria
+                    médica (la empresa realizará el seguimiento médico de cada accidentado,
+                    solicitando informes periódicos al médico tratante y guardará los estudios de
+                    diagnóstico e historias clínicas hasta el alta definitiva, sin perjuicio de
+                    entregar copia al beneficiario, si lo solicitare. c) controles de Análisis de
+                    Riesgo: en todas aquellas actividades donde se pone en riesgo la integridad
+                    física de los menores. Se entiende como aquellas donde el riesgo es tal que
+                    ningún acto de vigilancia posible garantiza un nivel de seguridad mínima y/o
+                    porque la actividad se desarrolla en condiciones que hacen difícil o imposible
+                    una asistencia médica a tiempo. </p>
+                <p>
+                    <strong>3.8.5.</strong> El Establecimiento deberá informar a COMFYE a través de
+                    medio fehaciente, en caso de recibir un reclamo extrajudicial y/o cédula
+                    judicial o requerimiento de mediación relacionado a un accidente estudiantil. En
+                    tal caso las prestaciones médicas de Comfye programadas se interrumpirán, salvo
+                    que las mismas tengan carácter de urgencia médica, en atención a que deberán ser
+                    asumidas por la compañía de seguros que contrate el Establecimiento para cubrir
+                    su responsabilidad civil conforme lo establecido en el art. 1767 del CCCN. </p>
+                <p>
+                    <strong>3.8.6.</strong> El establecimiento deberá Notificar a la PRESTADORA
+                    TODAS AQUELLAS ENFERMEDADES CRÓNICAS Y PATOLOGÍAS PREEXISTENTES de carácter
+                    moderado o severo de sus alumnos, de la cuales TUVIERE CONOCIMIENTO EL
+                    ESTABLECIMIENTO, por considerarse de SUMA IMPORTANCIA AL MOMENTO DE LA
+                    ASISTENCIA MÉDICA Y DE LA PREVENCIÓN. </p>
+                <p>
+                    <strong>CLAUSULA Nº 4: UBICACIONES DE RIESGO:</strong> A todos los fines del
+                    presente contrato, el ESTABLECIMIENTO denuncia como ubicaciones de riesgo, los
+                    que se indican a continuación: </p>
+                <table class="table table-bordered contract-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left">Domicilio</th>
+                            <th style="text-align: left">Localidad/Provincia</th>
+                            <th style="text-align: left">Natatorio</th>
+                            <th style="text-align: left">Teléfono</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--  Solo direcciones adicionales (contactos tipo 'other')  -->
+                        <t t-set="company_partner"
+                            t-value="doc.partner_id.parent_id if doc.partner_id.parent_id else doc.partner_id" />
+                        <t
+                            t-foreach="company_partner.child_ids.filtered(lambda c: c.type == 'other')"
+                            t-as="location">
+                            <tr>
+                                <td style="text-align: left">
+                                    <t t-esc="location.street or '---'" />
+                                </td>
+                                <td style="text-align: left">
+                                    <t t-esc="location.city or '---'" />
+                                </td>
+                                <td style="text-align: left">
+                                    <t t-esc="location.comment or 'NO'" />
+                                </td>
+                                <td style="text-align: left">
+                                    <t t-esc="location.phone or '---'" />
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <p>
+                    <strong>CLÁUSULA Nº 5:</strong>
+                </p>
+                <p>MANIFESTACIÓN DE NÚMERO DE ALUMNOS y PRECIO DE LOS SERVICIOS. A todos los fines y
+                    efectos del presente contrato, el ESTABLECIMIENTO declara tener la cantidad de
+                    alumnos que
+                    se detalla a continuación y la PRESTADORA cuantifica el valor de la
+                    contraprestación.
+                </p>
+                <table class="table table-bordered contract-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left">NIVELES</th>
+                            <th style="text-align: left">CANT. DE ALUMNOS</th>
+                            <th style="text-align: left">CAPITA 2026</th>
+                            <th style="text-align: left">SUBTOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="doc.order_line.filtered(lambda l: not l.display_type)"
+                            t-as="line">
+                            <tr>
+                                <td style="text-align: left">
+                                    <t t-esc="line.product_id.name" />
+                                </td>
+                                <td style="text-align: right">
+                                    <t t-esc="int(line.product_uom_qty)" />
+                                </td>
+                                <td style="text-align: right;">
+                                    <t t-esc="line.price_unit"
+                                        t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                                </td>
+                                <td style="text-align: right;">
+                                    <t t-esc="line.price_total"
+                                        t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                                </td>
+                            </tr>
+                        </t>
+                        <t t-set="financial_diff"
+                            t-value="doc.payment_schedule_total - doc.amount_total" />
+                        <tr t-if="abs(financial_diff) &gt; 0.01">
+                            <td style="text-align: left">
+                                <span t-if="financial_diff &gt; 0">Ajuste Forma de pago</span>
+                                <span t-else="">Bonificación Forma de pago</span>
+                            </td>
+                            <td style="text-align: right;">-</td>
+                            <td style="text-align: right;">
+                                <t t-esc="financial_diff"
+                                    t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                            </td>
+                            <td style="text-align: right;">
+                                <t t-esc="financial_diff"
+                                    t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td />
+                            <td />
+                            <td style="font-weight:bold; text-align:left;">TOTAL</td>
+                            <td style="font-weight:bold; text-align:right;">
+                                <t t-esc="doc.payment_schedule_total"
+                                    t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <p>
+                    <strong>CLÁUSULA Nº 6: VIGENCIA:</strong> El presente contrato tendrá una
+                    vigencia de 12 meses, entre las cero (0) horas del día <t
+                        t-esc="doc.contract_start_date and doc.contract_start_date.strftime('%d/%m/%Y') or '_______'" />
+                    hasta las veinticuatro (24) horas del <t
+                        t-esc="doc.contract_end_date and doc.contract_end_date.strftime('%d/%m/%Y') or '_______'" />
+                    fecha esta última a partir de la cual se extinguen en forma automática las
+                    obligaciones emergentes del presente contrato, salvo lo referente al pago de lo
+                    adeudado y las prestaciones médicas que estuvieran en curso de ejecución y hasta
+                    el límite acordado. </p>
+                <p>
+                    <strong>CLÁUSULA N° 7:</strong> Los gastos de sellado que demande el presente
+                    contrato, serán soportados por ambos contratantes en partes iguales. </p>
+                <p>
+                    <strong>CLÁUSULA N° 8:</strong> Las partes constituyen domicilios especiales en
+                    los indicados más arriba y en los siguientes domicilios electrónicos
+                    marianamatias@comfye.com.ar /<t
+                        t-esc="doc.partner_id.parent_id.email or doc.partner_id.email or doc.partner_id.email" />,
+                    donde serán válidas todas las notificaciones que se cursen. Si se produjera un
+                    cambio de domicilio, para tener validez deberá ser notificado en forma
+                    fehaciente a la otra parte. Las partes se someten a la jurisdicción de los
+                    tribunales ordinarios de la ciudad de San Miguel de Tucumán por cualquier
+                    cuestión que pudiera suscitarse con motivo de la ejecución y/o interpretación
+                    del presente contrato, renunciando a cualquier otro fuero que por cosas o
+                    personas pudiera corresponder. </p>
+                <p>Leído por las partes y de conformidad con su contenido, se firman dos ejemplares
+                    un mismo tenor y a un solo efecto, a los <t
+                        t-esc="(doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%d')" />
+                    días del mes de <t
+                        t-esc="{'January': 'enero', 'February': 'febrero', 'March': 'marzo', 'April': 'abril', 'May': 'mayo', 'June': 'junio', 'July': 'julio', 'August': 'agosto', 'September': 'septiembre', 'October': 'octubre', 'November': 'noviembre', 'December': 'diciembre'}.get((doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%B'), (doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%B'))" />
+                    de <t
+                        t-esc="(doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%Y')" />
+                </p>
+                <p>
+                    <strong>ANEXO N° I: Exclusiones.</strong>
+                </p>
+                <p>
+                    <strong>CLÁUSULA Nº 1: Situaciones excluidas de los servicios contratados: En
+                        general las
+                        que no se encuadren en la característica de accidentes estudiantiles o no
+                        incluidos
+                        expresamente en el presente. En particular se consideran excluidos del
+                        servicio
+                        contratado:
+                    </strong>
+                </p>
+                <p>
+                    <strong>1.1.-</strong> Los accidentes sufridos por personas que no consten en
+                    las nóminas presentadas por el ESTABLECIMIENTO como alumnos, sea la original o
+                    por altas posteriores comunicadas fehacientemente. Si a la fecha del accidente,
+                    el ESTABLECIMIENTO no ha cumplimentado aún con el requisito de presentación de
+                    listados (según anexo III de las condiciones particulares), deberá certificar en
+                    la denuncia de accidente la condición de alumno regular de la Institución del
+                    accidentado. </p>
+                <p>
+                    <strong>1.2.-</strong> Los accidentes en los cuales el accidentado no se haya
+                    presentado inmediatamente a uno de los Centros Médicos Autorizados de nuestra
+                    Red de Prestadores o cualquier otro centro de atención médica. </p>
+                <p>
+                    <strong>1.3.-</strong> Las consecuencias posteriores de cualquier accidente que
+                    habiendo sido atendido por nuestro sistema, sean reclamadas después del plazo de
+                    máximo de un (1) año a partir del alta médica certificada por el médico auditor;
+                    o en un máximo de 3 (tres) meses de no presentarse al control médico
+                    correspondiente, situación ésta que será considerada como abandono de
+                    tratamiento, liberando de responsabilidad tanto a la Prestadora cuanto al médico
+                    tratante. </p>
+                <p>
+                    <strong>1.4.-</strong> Las consecuencias y/o reclamos posteriores de cualquier
+                    accidente que se produzcan por el incumplimiento del accidentado de los
+                    tratamientos médicos prescriptos por el o los profesionales tratantes con
+                    estricto control de Auditoría Médica. </p>
+                <p>
+                    <strong>1.5.-</strong> Los accidentes producidos durante actividades organizadas
+                    por el establecimiento sin supervisión docente. </p>
+                <p>
+                    <strong>1.6.-</strong> Los accidentes producidos fuera de la actividad escolar;
+                    que no pertenezcan al Plan Oficial de Estudios del establecimiento o que no
+                    hayan sido organizados por la Institución Educativa. </p>
+                <p>
+                    <strong>1.7.-</strong> Patologías o enfermedades que no tengan relación alguna
+                    con la Accidentología educativa. </p>
+                <p>
+                    <strong>1.8.-</strong> Los accidentes ocurridos en estado de enajenación mental
+                    o por estado de ebriedad o por estar el alumno bajo la influencia de
+                    estupefacientes o alcaloides. </p>
+                <p>
+                    <strong>1.9.-</strong> Las consecuencias y/o tratamientos o reclamos causados
+                    por agresión que se hayan producido con dolo, auto agresión, suicidio o su
+                    tentativa. </p>
+                <p>
+                    <strong>1.10.-</strong> Los reclamos derivados por gastos ocasionados: a) por
+                    doble atención a causa de desacuerdo médico, b) por cama de acompañante para
+                    alumnos mayores de 12 años. </p>
+                <p>
+                    <strong>1.11.-</strong> Los accidentes que no sean encuadrados como accidentes
+                    estudiantiles o que no cumplan con los requisitos formales indicados en el
+                    presente contrato. </p>
+                <p>
+                    <strong>1.12.-</strong> Los accidentes producidos en el desarrollo de Prácticas
+                    Estudiantiles No Rentadas (o Pasantías No Rentadas) que no hayan sido
+                    comunicadas o que no cumplimenten con los requisitos en materia de seguridad y
+                    con la/s normativa/s vigentes específicas del área y con los requisitos
+                    estipulados ley nacional 26.427; leyes nacionales 26.058 y 26.202, y el Decreto
+                    Reglamentario Nacional Nº 1374/11. </p>
+                <p>
+                    <strong>1.13.-</strong> Los daños a los bienes de los alumnos o la desaparición
+                    total o parcial de los mismos, aun en ocasión de la prestación del servicio. </p>
+                <p>
+                    <strong>1.14.-</strong> Los accidentes producidos en el desarrollo de Viajes de
+                    Estudios fuera de la Provincia, que no hayan sido comunicados o que no
+                    cumplimenten con los requisitos en materia de seguridad; con las normativas
+                    vigentes específicas del área (LEY NACIONAL DE TURISMO ESTUDIANTIL 25.599 Y SU
+                    MODIFICATORIA; RESOLUCIÓN. Nª 23/2014 PUBLICADA EL 29-01-2014) y del presente
+                    contrato, Anexo III Inc. V. </p>
+                <p>
+                    <strong>1.15.-</strong> Quedan excluidos de los servicios de accidentologÍa los
+                    accidentes producidos por la práctica de deportes considerados de alto riesgo
+                    como: Trekking con ascensos y descensos por senderos de cerros, montañas o
+                    sierras que conlleven el riesgo de caída de altura o riesgos mayores a los de un
+                    paseo; Mountain bike, moto cross; aladeltismo; rafting; rappel y similares;
+                    práctica de natación en aguas abiertas; Kayak en las modalidades kayak de mar
+                    para travesías y exploración costera, kayak de aguas bravas para un desafío en
+                    ríos rápidos, y kayak recreativo para disfrutar de lagos y ríos tranquilo,
+                    práctica de buceo en sus distintas modalidades recreativo, técnico, comercial,
+                    cuevas, naufragios, profundo, apnea, autónomo con cilindro; Carreras de karting
+                    recreativo, competición de aficionados y karting de competición profesional o de
+                    cualquier otro vehículo con propulsión a nafta, eléctrico, gasoil y/o cualquier
+                    otro tipo de combustible, que se practiquen en pistas autorizadas o no al
+                    efecto. Salvo cuando se realicen conforme lo dispuesto por Leyes provinciales
+                    y/o disposiciones municipales; que se contrate con empresas que se encuentren
+                    habilitadas y dispongan de personal profesional a tal efecto con certificación
+                    habilitante. </p>
+                <p>
+                    <strong>1.16.-</strong> Los accidentes producidos por la práctica del Rugby y de
+                    otros Deportes extremos en Competencias Deportivas organizadas por TERCEROS
+                    (entidades privadas), fuera del ámbito educativo. </p>
+                <p>
+                    <strong>1.17.-</strong> Las consecuencias de accidentes y/o reclamos producidos
+                    por la práctica de Hockey y Rugby que no cumplan las normativas, reglamentos y
+                    normas de seguridad vigentes en las respectivas Asociaciones / Federaciones /
+                    Uniones, según corresponda, para la práctica de estos deportes. </p>
+                <p>
+                    <strong>1.18.-</strong> Los accidentes sufridos en ocasión del uso de peloteros
+                    que conlleven el riesgo de caída de altura, camas elásticas sin protección y
+                    juegos en general o similares que no posean certificaciones de seguridad por
+                    organismos nacionales que regulan su uso. </p>
+                <p>
+                    <strong>1.19.-</strong> Transporte de personas: Las consecuencias de accidentes
+                    producidos mientras los alumnos se encuentren dentro de los vehículos que los
+                    transporten. </p>
+                <p>
+                    <strong>1.20.-</strong> Las consecuencias de los accidentes producidos en la vía
+                    pública, en horarios de clases, sin supervisión de la autoridad educativa y sin
+                    mediar comunicación fehaciente a los padres del cambio de horario de salida de
+                    los alumnos; participación en caravanas en vehículos donde los alumnos no
+                    cumplan con la normativa municipal de tránsito. </p>
+                <p>
+                    <strong>1.21.-</strong> Los Riesgos no incluidos en la Póliza de Responsabilidad
+                    Civil, que tome el Establecimiento, salvo accidentes in itinere, según
+                    condiciones de anexo II. </p>
+                <p>
+                    <strong>1.22.-</strong> Las demás exclusiones que en forma específica surjan del
+                    contrato o de sus anexos. </p>
+                <p>
+                    <strong>1.23.-</strong> Agravación de Riesgo: toda agravación del riesgo
+                    asumido, es causa especial de rescisión de contrato y suspensión de las
+                    prestaciones. </p>
+                <p>
+                    <strong>1.24.-</strong> Reticencia: las declaraciones falsas o reticencias de
+                    circunstancias conocidas por el Establecimiento, producen la nulidad del
+                    contrato. </p>
+                <p>
+                    <strong>1.25.-</strong> Quedan expresamente excluidas TODAS LAS PRESTACIONES QUE
+                    TENGAN ORÍGEN EN EL CONTAGIO COLECTIVO O INDIVIDUAL DE ENFERMEDADES INFECTO
+                    CONTAGIOSAS TALES COMO COVID-19 u otras, AUN CUANDO EL MISMO SE HAYA PRODUCIDO
+                    DENTRO DEL ESTABLECIMIENTO, DURANTE O LUEGO DEL HORARIO ESCOLAR, Y/O EN UNA
+                    ACTIVIDAD (PROGRAMÁTICA O EXTRAPROGRAMÁTICA) ORGANIZADA Y/O SUPERVISADA POR EL
+                    ESTABLECIMIENTO. </p>
+                <p>
+                    <strong>1.26.-</strong> Las enfermedades preexistentes: ENFERMEDAD PREEXISTENTE.
+                    Corresponde a cualquier enfermedad, patología o condición de salud que haya sido
+                    conocida por el afiliado y/o diagnosticada médicamente con anterioridad a la
+                    suscripción del contrato. Como así también aquella que es diagnosticada
+                    médicamente durante un tratamiento motivado por un accidente sufrido por el
+                    beneficiario durante la vigencia del contrato. Según condiciones del ANEXO IV –
+                    Nomenclador de enfermedades preexistentes - Sin perjuicio de NO limitar
+                    únicamente a las allí detalladas, y al sólo efecto informativo, se nombran
+                    algunas pudiéndose ampliar la nómina incorporando oportunamente aún más durante
+                    la vigencia del presente contrato. </p>
+                <p>
+                    <strong>ANEXO II: ACCIDENTE IN ITINERE</strong>
+                </p>
+                <p>CLÁUSULA Nº 1:</p>
+                <p>1.1. El Servicio incluye también la atención de los denominados accidente in
+                    itinere
+                    bajo las siguientes términos, condiciones y limitaciones.
+                </p>
+                <p>1.2. Tipo de prestación de servicios. La prestación de servicios en accidentes
+                    in-itinere se limita a la atención médico-farmacéutica del accidentado hasta
+                    cubrir la
+                    emergencia inmediata. La atención posterior y eventualmente las indemnizaciones
+                    por
+                    incapacidades parciales o totales o muerte, deberán ser reclamadas a los
+                    responsables
+                    civiles de dicho accidente. Sin perjuicio de ello se prevé una asistencia en los
+                    límites
+                    mencionados más abajo.
+                </p>
+                <p>1.3. Límite del accidente in itinere: Asistencia Médico-Farmacéutica y/o subsidio
+                    por fallecimiento o incapacidad: hasta el monto de <t
+                        t-esc="doc.insured_amount * doc.in_itinere_limit"
+                        t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                    ( <t t-esc="doc._amount_to_words(doc.insured_amount * doc.in_itinere_limit)" />
+                    ) por alumno y por evento. </p>
+                <p>En caso de pluralidad de damnificados el límite máximo será de <t
+                        t-esc="doc.insured_amount * doc.in_itinere_plural_limit"
+                        t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                    ( <t
+                        t-esc="doc._amount_to_words(doc.insured_amount * doc.in_itinere_plural_limit)" />
+                    ) </p>
+                <p>1.4. Accidente in-itinere sin responsabilidad de terceros: daños corporales por
+                    acontecimientos traumáticos sin que haya intervención de agentes externos
+                    responsables o
+                    terceras personas; se prestarán los servicios, según las condiciones y límites
+                    establecidos en el presente contrato y anexo.
+                </p>
+                <p>Requisitos a cumplimentar en COMFYE dentro de las 72hs. corridas de producido el
+                    siniestro: Las prestaciones se brindarán siempre y cuando se cumplimente con la
+                    siguiente
+                    documentación en tiempo y forma I) Denuncia oficial de siniestro; II) Medio
+                    habitual de
+                    transporte; III) Denuncia Policial del accidente (donde conste detalle sobre
+                    lugar y
+                    circunstancias del accidente incluyendo testigos, si los hubiere); IV)
+                    Cumplimiento de
+                    todas las medidas de seguridad y las disposiciones legales y/o reglamentarias al
+                    respecto.
+                </p>
+                <p>1.5. Accidente in-itinere con responsabilidad de terceros: Daños corporales por
+                    acontecimientos traumáticos en donde exista un Tercero responsable, sean
+                    Peatones,
+                    Automotores, etc.- Los servicios de COMFYE se prestarán sólo en caso de que no
+                    tuvieran
+                    otra cobertura más específica. Si ocurriera que el Tercero responsable no acude
+                    inmediatamente o no es identificable, COMFYE efectuará las prestaciones médicas
+                    necesarias
+                    según las condiciones y límites establecidos en el presente contrato y anexo:
+                </p>
+                <p>Requisitos a cumplimentar en COMFYE dentro de las 72hs. Corridas de producido el
+                    siniestro:
+                </p>
+                <p>- I) Denuncia Oficial del Siniestro; II) Medio habitual de transporte; III)
+                    Denuncia
+                    Policial (donde conste detalle sobre lugar, hora, circunstancias del accidente,
+                    identificación del responsable, identificación del vehículo y de su propietario;
+                    si fuera
+                    el caso, IV) Copia de la denuncia de siniestro presentada por el titular del
+                    vehículo en
+                    su compañía de seguro; si aplicara, V) Cumplimiento de todas las medidas de
+                    seguridad y
+                    las disposiciones legales y reglamentarias respectivas, VI) Cesión de los
+                    créditos
+                    derivados del accidente por los servicios prestados por Comfye y hasta lo
+                    efectivamente
+                    erogado.
+                </p>
+                <p>1.6. Riesgos no cubierto: Exclusiones Específica:</p>
+                <p>a) Los accidentes derivados por la utilización de ciclomotores, motos, patinetas,
+                    monopatín eléctrico y similares, sea como conductor o tercero transportado;
+                </p>
+                <p>b) los accidentes ocurridos en los traslados de alumnos realizados por vehículos
+                    automotores destinados al transporte escolar y/o de pasajeros, habilitados
+                    oficialmente
+                    por autoridad competente, estando obligados a contar estos con un SEGURO DE
+                    TERCEROS
+                    TRANSPORTADOS para sus pasajeros;
+                </p>
+                <p>c) Los accidentes producidos en el traslado de los alumnos en vehículos de los
+                    padres,
+                    encargados o tutores;
+                </p>
+                <p>d) Los accidentes sufridos por los alumnos si los mismos se producen fuera del
+                    trayecto
+                    in itinere. Se excluyen los daños sufridos por acciones dolosas de terceros o
+                    daños por
+                    agresiones recíprocas o no, en riña o con armas blancas y de fuego;
+                </p>
+                <p>e) En ningún caso se resarcirá los daños producidos a los bienes del alumno o
+                    desaparición éstos aunque se produjeran durante la prestación del servicio.
+                </p>
+                <p>
+                    <strong>ANEXO Nº III: Condiciones Particulares.</strong>
+                </p>
+                <p>I) - Listados: La nómina de alumnos deberá ser presentada a LA PRESTADORA dentro
+                    de los
+                    treinta (30) días de iniciado el ciclo lectivo o de inicio de la vigencia del
+                    presente
+                    contrato. La presentación debe realizarse de manera digital, a través del sitio
+                    de
+                    autogestión de la Prestadora. La falta de presentación de la nómina en el plazo
+                    señalado,
+                    producirá la suspensión temporaria de la cobertura hasta el cumplimiento de
+                    dicha
+                    presentación. En la misma deberá constar: Apellido y Nombre, Nº DNI, Domicilio,
+                    Fecha de
+                    nacimiento, listados por nivel y por curso o grado; y al menos los datos de un
+                    mayor
+                    responsable del alumno (padre/madre/tutor): apellido y nombre, correo
+                    electrónico y
+                    celular del padre, madre, tutor designado
+                </p>
+                <p>II) - Horario de clases: El Establecimiento deberá adjuntar a la nómina
+                    presentada, el
+                    horario de actividades normales del alumnado por cada nivel
+                </p>
+                <p>III) - a) Altas de alumnos: El Establecimiento podrá dar de alta a nuevos alumnos
+                    durante el ciclo lectivo comunicando las mismas por Nota y abonando las cápitas
+                    correspondientes cuando se produzcan, a los efectos de la pertinente prestación
+                    de
+                    servicios. b) Bajas de alumnos: El Establecimiento deberá comunicar las bajas
+                    producidas
+                    dentro de las 48 hs. del correspondiente egreso. Sólo se considerarán en la
+                    facturación
+                    las bajas ocurridas y debidamente informadas hasta los treinta días de iniciada
+                    la
+                    vigencia de la cobertura. Las bajas posteriores serán registradas al sólo efecto
+                    de la
+                    depuración de los padrones sin excepción.
+                </p>
+                <p>IV) Denuncia de Accidente: La Denuncia de Accidente es considerada como
+                    Declaración
+                    Jurada para todos los efectos legales y de control. Se podrá realizar de dos
+                    maneras:
+                    manual o vía Web. En caso de ser manual, el ESTABLECIMIENTO deberá retener el
+                    triplicado y
+                    entregar al accidentado el original y duplicado a los fines de acceder a la
+                    prestación
+                    médica. Para el caso de que se realice vía Web, el ESTABLECIMIENTO deberá
+                    imprimir dos
+                    copias, entregando una de ellas al accidentado y/o padre/madre, tutor/a
+                    o encargado/a y la
+                    otra deberá ser firmada por quién reciba una de las copias, quedando ésta en el
+                    ESTABLECIMIENTO.
+                </p>
+                <p>V) Viajes de Estudios y Salidas Programadas: Están incluidos dentro de los
+                    servicios la
+                    prestación del servicio en todas las salidas dentro de la República Argentina,
+                    siempre y
+                    cuando estén organizadas y supervisadas por docentes del establecimiento. Y
+                    siempre que se
+                    desarrollen en cumplimiento de la ley nacional de turismo 25.699, sus modif., y
+                    la
+                    regulación provincial correspondiente. a) El establecimiento deberá comunicar
+                    las salidas
+                    fuera de la Provincia por nota, detallando curso/grado, nómina de alumnos, lugar
+                    y fecha
+                    de salida y de regreso, medio de transporte (nombre de la empresa, póliza de
+                    seguro del
+                    transporte con su correspondiente pago, carnet de manejo de los conductores,
+                    inspección
+                    técnica vehicular) y docentes a cargo, empresa de turismo estudiantil
+                    habilitada, con 96
+                    hs. de anticipación al viaje. b) Las salidas dentro de la Provincia, deberán ser
+                    informadas telefónicamente solicitando el Nº de Gestión o a través de nuestra
+                    página Web.
+                    Se deberá detallar curso/grado, nómina de alumnos, lugar y fecha de salida y de
+                    regreso,
+                    medio de transporte y docentes a cargo con 24 hs. de anticipación a los efectos
+                    de la
+                    coordinación de prestaciones.
+                </p>
+                <p>La Nómina completa de Prestadores se encuentra disponible en nuestro sitio Web.
+                    En caso
+                    de no contar con Prestadores en la localidad del accidente, se deberá concurrir
+                    al
+                    Prestador Médico más cercano y se realizarán todos los reintegros
+                    correspondientes al
+                    accidente ocurrido, según cláusula nº VIII del presente anexo.
+                </p>
+                <p>VI) Actividades Extra Programáticas o Extracurriculares: Están incluidos dentro
+                    de los
+                    servicios contratados todas las actividades extracurriculares, siempre y cuando
+                    estén
+                    organizadas y supervisadas por docentes del establecimiento. Las mismas deberán
+                    ser
+                    informadas telefónicamente solicitando el Nº de Gestión o a través de nuestra
+                    página Web.
+                    Se deberá detallar curso/grado, lugar y fecha de salida y de regreso, medio de
+                    transporte
+                    y docentes a cargo con 24 hs. de anticipación a los efectos de la coordinación
+                    de
+                    prestaciones.
+                </p>
+                <p>VII) Departamento de Auditoria Médica: La PRESTADORA se reserva el derecho de
+                    Auditoría
+                    Médica y Administrativa de todo accidente denunciado.
+                </p>
+                <p>VIII) Solicitud de Reintegro: El sistema de servicios de La Empresa NO funciona
+                    como un
+                    sistema de reintegro. Está diseñado para que el beneficiario no realice
+                    desembolso de
+                    dinero por ningún concepto. En los casos en que se realice desembolso de dinero
+                    por: a)
+                    salidas fuera de la provincia o casos que lo justifiquen, deberá presentarse la
+                    solicitud
+                    de reintegro del siguiente modo: a) Denuncia de accidente, según anexo II-inciso
+                    IV,
+                    referente a obligaciones del ESTABLECIMIENTO. b) Comprobantes originales de los
+                    gastos
+                    efectuados en concepto de prestaciones médicas y/o farmacéuticas
+                    exclusivamente, en un
+                    plazo no mayor de quince (15) días corridos, de producido el siniestro. En caso
+                    de
+                    excederse del período indicado, La Empresa podrá desestimar la gestión
+                    teniéndola por no
+                    presentada. En ningún caso se aceptarán comprobantes que excedan los 6 (seis)
+                    meses
+                    contados desde su emisión. La presentación deberá realizarse de lunes a viernes
+                    de 8:00 a
+                    16:00 hs. quedando sujeta a auditoría médica y administrativa, con la siguiente
+                    mecánica:
+                    a) el solicitante debe completar la solicitud de reintegro; b) en caso de
+                    medicamento:
+                    orden de pedido del médico tratante del accidente, factura de la farmacia y
+                    troqueles
+                    correspondientes, c) en caso de práctica médica-sanatorial: historia clínica
+                    completa y
+                    recibos o facturas correspondientes.
+                </p>
+                <p>IX) Prácticas estudiantiles o Pasantías: a) Quedan incluidas las actividades de
+                    Prácticas Estudiantiles o Pasantías No Rentadas que cumplimenten con los
+                    requisitos
+                    establecidos en la ley nacional 26.427; ley nacional 26.058 y 26.206, junto al
+                    decreto
+                    reglamentario nacional Nº 1374/11, en subsidio de la cobertura establecida en la
+                    ART
+                    correspondiente. b) Los requisitos en materia de seguridad que cumplan con la/s
+                    normativa/s vigente/s específicas del área. c) Nota de Comunicación a la empresa
+                    con siete
+                    (7) días de anticipación al inicio de las prácticas, a fin de SOLICITAR la
+                    ampliación de
+                    cobertura correspondiente a la Compañía de Seguros que el establecimiento haya
+                    contratado
+                    para la cobertura de la responsabilidad civil.
+                </p>
+                <p>
+                    <strong>IMPORTANTE: TODOS ESTOS TRÁMITES ADMINISTRATIVOS PUEDEN ANTICIPARSE EN
+                        FORMA
+                        ELECTRÓNICA A TRAVÉS DE NUESTRA PÁGINA WEB: WWW.COMFYE.COM
+                    </strong>
+                </p>
+                <p>
+                    <strong>ANEXO IV – Nomenclador de enfermedades preexistentes</strong>
+                </p>
+                <p>Al sólo efecto informativo a continuación, se detallan algunas enfermedades
+                    preexistentes.
+                </p>
+                <p>
+                    <strong>CLÁUSULA I. NOMENCLADOR.</strong> Displasia - luxación de rótula -
+                    luxación de hombro recidivante. Osteocondritis crónica. Epifisiolisis de cadera
+                    (deslizamiento epifisario de la cabeza femoral). Hernia de Disco. Osgood -
+                    Schlatter . Enfermedad de Perthes . Enfermedades que pueden ser diagnosticadas
+                    existiendo el origen congénito o genético detectado por estudios
+                    complementarios. Enfermedades congénitas, neurológicas Convulsivas Degenerativas
+                    Desmielinizantes Cardiovasculares Tumorales Hematológicas Del Neurodesarrollo. </p>
+                <p>
+                    <strong>CLÁUSULA II. SUSPENSIÓN O FINALIZACIÓN DEL TRATAMIENTO.</strong> Tal
+                    como se expresa en el Anexo II “de las exclusiones” 1.26, de diagnosticarse
+                    cualquiera de las enfermedades detalladas anteriormente, la empresa se reserva
+                    el derecho de continuar brindando toda prestación, pudiendo suspender o bien
+                    dando por finalizado el tratamiento médico desde el mismo momento en que la
+                    patología preexistente fuera determinada. Sin perjuicio de que el beneficiario
+                    y/o alumno pudieran continuar por su obra social, prepaga y/o cualquier medio
+                    que dispongan. </p>
+                <p>
+                    <strong>CLÁUSULA III. NOTIFICACIÓN.</strong> La empresa notificará de la
+                    resolución sin mediar mayores explicaciones ni fundamentos, a través de medio
+                    fehaciente tanto al Establecimiento como así mismo a los alumnos/beneficiarios,
+                    padres y/o tutores, según corresponda. </p>
+                <section t-if="doc.emergencies">
+                    <p>
+                        <strong>ANEXO V - Del Servicio de Emergencias médicas</strong>
+                    </p>
+                    <p>
+                        <strong>CLÁUSULA I. Contratación: La empresa se obliga a prestar el servicio
+                            de
+                            emergencias médicas conforme las condiciones y servicios que se detallan
+                            a
+                            continuación:
+                        </strong>
+                    </p>
+                    <p>A) Será brindado por Emerg Comfye (de titularidad de COMFYE SRL) , con
+                        unidades de
+                        terapia intensiva móvil (UTIM), unidades de traslados programados (UTP) y
+                        unidades de
+                        consulta (UC), a fin de asistir las Emergencias y Urgencias médicas en el
+                        Establecimiento educativo y/o donde realicen Educación Física y/u otras
+                        ubicaciones de
+                        riesgo, siempre que sea dentro del radio de 10 Km. de las bases de
+                        emergencias ubicadas
+                        en calles Laprida 637 y Marcos Paz 1828, de la ciudad de San Miguel de
+                        Tucumán. Las
+                        localidades con cobertura de Emergencia Médica son: San Miguel de Tucumán,
+                        Yerba Buena,
+                        Horco Molle, San José, Villa Carmela, Tafí Viejo, Villa M. Moreno, Las
+                        Talitas,
+                        Alderetes, Banda del Río Salí, Lastenia y El Manantial.
+                    </p>
+                    <p>B) Servicio de Atención de Consultas Médicas Orientativas - TELEMEDICINA: :
+                        Será
+                        prestado por Emerg Comfye (perteneciente a Comfye SRL) y comprende la Tele
+                        asistencia de
+                        un Médico ante cualquier requerimiento de asistencia médica de los alumnos
+                        de la
+                        institución educativa. Implica el servicio médico asistencial pre-
+                        hospitalario de
+                        atención de crisis de salud que no revisten gravedad, resultando a priori
+                        innecesario el
+                        traslado del paciente, pero que requiere atención médica orientativa. En los
+                        casos que
+                        fuere necesario enviará la unidad de emergencia al local escolar.
+                    </p>
+                    <p>C) Descripción del Servicio de Emergencias: Atención de alumnos/as
+                        accidentados: El
+                        Servicio de Emergencias brindará la atención del accidentado, en accidentes
+                        sufridos en
+                        ocasión de la actividad educativa, dentro del establecimiento o en las
+                        ubicaciones de
+                        riesgo declaradas en el presente contrato y el traslado de aquél a un Centro
+                        Asistencial
+                        Autorizado de la Red de Prestadores o al que los padres/ tutores o
+                        encargados soliciten.
+                    </p>
+                    <p>D) También se incluyen en ambos supuestos las Urgencias y Emergencias médicas
+                        NO
+                        escolares (no derivados de accidentes) que por su severidad requieran de la
+                        Atención
+                        Médica de Urgencia: enfermedades o patologías que se manifiesten en forma
+                        aguda en el
+                        ámbito escolar, y se considere necesaria la utilización del Servicio de
+                        Emergencia.
+                    </p>
+                    <p>E) Atención de Terceros accidentados dentro del Establecimiento Escolar
+                        (Servicio de
+                        Área Protegida): durante los horarios habituales de actividad escolar, toda
+                        persona que
+                        se encuentre en el establecimiento (alumnos, docentes, padres) gozará del
+                        beneficio de
+                        la primera atención y traslado por emergencias o urgencia médica al centro
+                        asistencial
+                        que indiquen o a un establecimiento.
+                    </p>
+                    <p>F) Exclusiones del servicio de emergencias: a) los requerimientos por
+                        enfermedad
+                        profesional y accidentes laborales (que deberán ser atendidos por la ART
+                        correspondiente) y las consultas por cuadros clínicos menores para docentes,
+                        personal
+                        administrativo o terceros. b) Tampoco se podrá utilizar el servicio de
+                        Emergencias para
+                        los alumnos en cuadros clínicos menores.
+                    </p>
+                </section>
+            </section>
+
+            <section
+                style="page-break-before: always; margin-top: 50px; padding: 30px; font-family: Arial, sans-serif; line-height: 1.6;">
+                <!--  Fecha alineada a la derecha  -->
+                <p style="text-align: right; margin-bottom: 30px; font-size: 12px;">San Miguel de
+                    Tucumán, <t
+                        t-esc="(doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%d')" />
+                    de <t
+                        t-esc="{'January': 'enero', 'February': 'febrero', 'March': 'marzo', 'April': 'abril', 'May': 'mayo', 'June': 'junio', 'July': 'julio', 'August': 'agosto', 'September': 'septiembre', 'October': 'octubre', 'November': 'noviembre', 'December': 'diciembre'}.get((doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%B'), (doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%B'))" />
+                    del <t
+                        t-esc="(doc.contract_sign_date or doc.signed_on or doc.date_order).strftime('%Y')" />
+                </p>
+                <!--  Destinatario  -->
+                <p style="margin-bottom: 10px; font-size: 12px;">
+                    <strong>Sres Comfye SRL</strong>
+                    <br /> S / D </p>
+                <!--  Asunto/Referencia  -->
+                <p style="margin-top: 25px; margin-bottom: 20px; font-size: 12px;">
+                    <strong style="text-decoration: underline;">Ref.:</strong>
+                    <strong>Solicitamos contratación de póliza de responsabilidad civil educativa
+                        obligatoria
+                        del art. 1767 del CCCN
+                    </strong>
+                </p>
+                <!--  Cuerpo de la carta  -->
+                <p
+                    style="text-align: justify; margin-bottom: 15px; font-size: 12px; text-indent: 30px;">
+                    Por la presente solicitamos y autorizamos a Ud. para que por su digno intermedio
+                    tenga a
+                    bien contratar una póliza de responsabilidad civil para establecimientos
+                    educativos a
+                    efectos de dar cabal cumplimiento con el art. 1767 del CCCN.
+                </p>
+                <p
+                    style="text-align: justify; margin-bottom: 15px; font-size: 12px; text-indent: 30px;">
+                    Que el requerimiento se hace con motivos del vínculo comercial que tiene Comfye
+                    con
+                    nuestra institución educativa y que por tanto, solicitamos que designe por su
+                    intermedio o
+                    por quien corresponda, un intermediario/Productor Asesor de Seguros debidamente
+                    matriculado para realizar las correspondientes gestiones de celebración del
+                    contrato de
+                    seguro y de carácter administrativo ante la compañía de seguros que se contrate,
+                    tales
+                    como rendición de pagos, gestiones que refieran a las modificaciones tales como
+                    endosos de
+                    ampliación, incrementar sumas aseguradas, incorporar actividades que por defecto
+                    no se
+                    encontraran contempladas siendo las facultades mencionadas meramente
+                    enunciativas y no
+                    taxativas.
+                </p>
+                <p
+                    style="text-align: justify; margin-bottom: 15px; font-size: 12px; text-indent: 30px;">
+                    También autorizo por la presente a Comfye para realizar cualquier acto o
+                    notificación
+                    vinculado con la Póliza a tomarse. Así mismo solicitamos tengan a bien
+                    considerar al
+                    establecimiento educativo como asegurado, con las siguientes condiciones
+                    particulares:
+                </p>
+                <!--  Datos de la póliza  -->
+                <div
+                    style="margin-top: 25px; margin-bottom: 25px; padding: 15px; background-color: #f9f9f9; border-left: 4px solid #333;">
+                    <p style="margin: 8px 0; font-size: 12px;">
+                        <strong>SUMA ASEGURADA por EVENTO A SOLICITAR:</strong>
+                        <t
+                            t-esc="doc.insured_amount"
+                            t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                        ( <t t-esc="doc._amount_to_words(doc.insured_amount)" /> ) </p>
+                    <p style="margin: 8px 0; font-size: 12px;">
+                        <strong>SUMA ASEGURADA por TODOS LOS EVENTOS A SOLICITAR:</strong>
+                        <t
+                            t-esc="doc.insured_amount * doc.events_max_quantity"
+                            t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                        ( <t
+                            t-esc="doc._amount_to_words(doc.insured_amount * doc.events_max_quantity)" />
+                        ) </p>
+                    <p style="margin: 8px 0; font-size: 12px;">
+                        <strong>Cantidad de Alumnos:</strong>
+                        <td>
+                            <t t-esc="int(line.product_uom_qty)" />
+                        </td>
+                    </p>
+                </div>
+            </section>
+            <section style="page-break-before: always;">
+                <!--  Título de la tabla  -->
+                <p style="margin-top: 30px; margin-bottom: 10px; font-size: 12px;">
+                    <strong>Ubicaciones de Riesgo</strong> (domicilio del Establecimiento y sus
+                    anexos donde se desarrollarán actividades programáticas y extraprogramáticas) </p>
+                <!--  Tabla con estilos mejorados  -->
+                <table class="table table-bordered contract-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left">Domicilio</th>
+                            <th style="text-align: left">Localidad/Provincia</th>
+                            <th style="text-align: left">Natatorio</th>
+                            <th style="text-align: left">Teléfono</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--  Solo direcciones adicionales (contactos tipo 'other')  -->
+                        <t t-set="company_partner"
+                            t-value="doc.partner_id.parent_id if doc.partner_id.parent_id else doc.partner_id" />
+                        <t
+                            t-foreach="company_partner.child_ids.filtered(lambda c: c.type == 'other')"
+                            t-as="location">
+                            <tr>
+                                <td style="text-align: left">
+                                    <t t-esc="location.street or '---'" />
+                                </td>
+                                <td style="text-align: left">
+                                    <t t-esc="location.city or '---'" />
+                                </td>
+                                <td style="text-align: left">
+                                    <t t-esc="location.comment or 'NO'" />
+                                </td>
+                                <td style="text-align: left">
+                                    <t t-esc="location.phone or '---'" />
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <!--  Compromiso final  -->
+                <p
+                    style="text-align: justify; margin-top: 20px; margin-bottom: 30px; font-size: 12px; text-indent: 30px;">
+                    Me comprometo en caso de cubrir el mismo interés y riesgo con más de un
+                    Asegurador, en
+                    notificarlo a cada uno de ellos con indicación del Asegurador y de la suma
+                    asegurada.
+                </p>
+                <!--  Despedida  -->
+                <p style="margin-top:30px;">Aguardamos provean de conformidad con nuestra solicitud,
+                    y
+                    aprovechamos para saludar con particular distinción.
+                </p>
+                <div class="row" style="margin-top:50px;">
+                    <div class="col-6 text-center">
+                        <img src="/insurance_api/static/src/img/firma-rep-tuc.png"
+                            style="max-height: 100px; margin-bottom: 10px;" />
+                        <br />
+                        <span>COMFYE S.R.L.</span>
+                        <br />
+                        <strong>MARIANA MATÍAS</strong>
+                        <br />
+                        <span>SOCIO GERENTE</span>
+                    </div>
+                    <div class="col-6 text-center">
+                        <t t-if="doc.contract_signature">
+                            <img t-att-src="image_data_uri(doc.contract_signature)"
+                                style="max-height: 100px; margin-bottom: 10px;" />
+                            <br />
+                        </t>
+                        <t t-else="">
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            ..................................................... <br />
+                        </t>
+                        <span>
+                            <span
+                                t-esc="doc.partner_id.parent_id.name if doc.partner_id.parent_id else doc.partner_id.name" />
+                        </span>
+                        <br />
+                        <strong>
+                            <span t-if="legal_rep">
+                                <t t-esc="legal_rep[0].name" />
+                            </span>
+                            <span
+                                t-elif="any(cat.name == 'Representante Legal' for cat in doc.partner_id.category_id)">
+                                <t t-esc="doc.partner_id.name" />
+                            </span>
+                        </strong>
+                        <br />
+                        <t t-if="rep_contact">
+                            <span t-if="rep_contact.title" t-esc="rep_contact.title.name" />
+                            <span t-if="not rep_contact.title">Representante Legal</span>
+                        </t>
+                        <t
+                            t-elif="any(cat.name == 'Representante Legal' for cat in doc.partner_id.category_id)">
+                            <span t-if="doc.partner_id.title" t-esc="doc.partner_id.title.name" />
+                            <span t-if="not doc.partner_id.title">Representante Legal</span>
+                        </t>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </template>
+</odoo>

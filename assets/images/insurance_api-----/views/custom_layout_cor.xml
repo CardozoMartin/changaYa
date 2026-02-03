@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="custom_layout_cordoba">
+        <t t-call="web.html_container">
+            <t t-set="body_classname" t-value="'container'"/>
+
+
+            <div class="print-footer">
+                <img src="/insurance_api/static/src/img/firma-rep-cor.png" alt="Firma"/>
+                <div class="footer-text">
+                    <strong>COMFYE CORDOBA S.A.</strong>
+                    <br/>
+                    MARCOS LOZADA ECHENIQUE - DIRECTOR
+                    <br/>
+                    C.U.I.T. 30-70886021-9
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

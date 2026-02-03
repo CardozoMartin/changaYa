@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_order_form_inherit_insurance_api" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.insurance.api</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Seguro">
+                    <group>
+                        <group string="Contrato">
+                            <field name="policy_number" string="Número de Póliza" widget="char"/>
+                            <field name="school_year" string="Período Lectivo" widget="char"/>
+                            <field name="insurer" string="Aseguradora" widget="char"/>
+                            <field name="contract_start_date" string="Fecha de Inicio del Contrato" widget="datetime"/>
+                            <field name="contract_end_date" string="Fecha de Fin del Contrato" widget="datetime"/>
+                            <field name="contract_sign_date" string="Fecha Firma del Contrato" widget="date"/>
+                            <field name="legal_representative_dni" string="DNI del representante legal" widget="char"/>
+                            <field name="show_insurance_table" string="Mostrar Tabla de Seguros" widget="boolean"/>
+                        </group>
+                        <group string="Coberturas">
+                            <field name="insured_amount" string="Suma Asegurada" widget="monetary"/>
+                            <field name="events_limit" string="Límite por evento" widget="percentage"/>
+                            <field name="in_itinere_limit" string="Límite in itinere" widget="percentage"/>
+                            <field name="events_max_quantity" string="Cantidad máxima de eventos" widget="integer"/>
+                            <field name="in_itinere_max_quantity" string="Cantidad de eventos in itinere" widget="integer"/>
+                            <field name="emergencies" string="Con Emergencias" widget="boolean"/>
+                            <field name="assistance_limit" string="Límite total de Asistencia médica" widget="percentage"/>
+                            <field name="in_itinere_plural_limit" string="Límite In Itinere Pluralidad" widget="percentage"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

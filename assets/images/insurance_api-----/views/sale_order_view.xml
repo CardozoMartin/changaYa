@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_order_form_inherit_payment_term_custom" model="ir.ui.view">
+    <field name="name">sale.order.form.payment.term.custom</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form" />
+    <field name="arch" type="xml">
+      <!-- Modificar el botón principal de proforma -->
+      <xpath expr="//button[@id='send_proforma_primary']" position="attributes">
+        <attribute name="string">Enviar Orden de venta</attribute>
+        <attribute name="disabled">1</attribute>
+      </xpath>
+      <!-- Ocultar el botón secundario de proforma -->
+      <xpath expr="//button[@id='send_proforma']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//button[@id='send_by_email']" position="attributes">
+        <attribute name="string">Enviar Orden de venta</attribute>
+        <attribute name="class">oe_highlight</attribute>
+      </xpath>
+
+      <!--Botones para el contrato-->
+      <xpath expr="//button[@id='send_by_email']" position="after">
+          <button name="action_send_contract_email" string="Enviar Contrato" type="object" class="btn-primary" data-hotkey="w" invisible="state != 'sale'" title="Enviar el enlace del contrato por email"/>
+          <button name="action_preview_contract" string="Ver Enlace Contrato" type="object" class="btn-secondary" data-hotkey="w" title="Abre la vista de firma del contrato en el portal"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

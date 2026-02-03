@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="contract_styles">
+        <style>
+          #top, #bottom, .header, .o_portal, .card-header {
+            display: none;
+          }
+
+          /* Título del documento para el navegador */
+          title {
+            display: none;
+          }
+          .card {
+            border: 0;
+          }
+          .card-body {
+            padding: 0!important;
+          }
+          .card-footer {
+            border-top: none;
+          }
+          <!-- Solo para Contratos -->
+          .bg-light {
+            background-color: white!important;
+          }
+          .contract {
+            font-size: 11pt;
+            line-height: 1.4;
+            text-align: justify;
+            color: #000;
+            background: none !important;
+          }
+          .contract-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+          }
+          .section-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            page-break-after: avoid;
+            padding-bottom: 0.2em;
+            text-align: left;
+          }
+          .subsection-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+          }
+          .contract p {
+            margin-bottom: 8px;
+            text-align: justify;
+            widows: 3;
+            orphans: 3;
+          }
+          .strong {
+            font-weight: bold;
+          }
+          .contract-table {
+            width: 100%;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border-collapse: collapse;
+          }
+          .contract-table th {
+            text-align: center;
+            background-color: #f8f9fa;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            font-weight: bold;
+          }
+          .contract-table td {
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+          }
+          .table-footer {
+            font-weight: bold;
+            background-color: #d8d8d8 !important;
+          }
+
+        <!-- Control de páginas -->
+          .keep-together {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+          .page-break {
+            page-break-before: always;
+          }
+          .signature-section {
+            margin-top: 50px;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+          }
+          .signature-block {
+            text-align: center;
+            margin-top: 50px;
+          }
+          .signature-image {
+            max-height: 100px;
+            margin-bottom: 10px;
+          }
+          .contact-info {
+            background-color: #f9f9f9;
+            border-left: 4px solid #333;
+            padding: 15px;
+            margin: 25px 0;
+          }
+
+          .print-footer {
+            display: none;
+          }
+
+          @media print {
+            /* Eliminar headers y footers del navegador */
+            @page {
+              size: A4;
+              margin: 2cm 2cm 3cm 3cm;
+
+              @bottom-center {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 10pt;
+                color: #000;
+              }
+
+              @bottom-left {
+               
+                max-height: 75px;
+                padding-left: 1cm;
+              }
+
+              p {
+                orphans: 3;
+                widows: 3;
+              }
+            }
+
+            /* Named page para páginas sin footer */
+            @page no-footer-page {
+              size: A4;
+              margin: 1.5cm 1.5cm 1.5cm 1.5cm; /* Márgenes sin espacio extra para footer */
+            }
+
+            /* Asignar named page a elementos con clase no-footer */
+            .no-footer {
+              page: no-footer-page;
+            }
+
+            /* Ocultar todos los elementos del portal */
+            a.btn {display: none !important;}
+            div.o_frontend_to_backend_nav {display: none !important;}
+            div.container {border: none !important;}
+            div.contract-content {border: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
+            div.border {border: none !important;}
+            .card-header {display: none !important;}
+            .card-footer {display: none !important;}
+            nav {display: none !important;}
+            header {display: none !important;}
+            footer:not(.print-footer) {display: none !important;}
+            .breadcrumb {display: none !important;}
+            .o_portal_sidebar {display: none !important;}
+            .breadcrumb-item {display: none !important;}
+            .modal {display: none !important;}
+            .navbar {display: none !important;}
+
+            /* Ocultar firma en páginas con named page no-footer-page */
+            @page no-footer-page {
+              @bottom-left {
+                content: none;
+              }
+            }
+
+            /* Alternativa: ocultar en páginas específicas con contador */
+            .no-footer .print-footer {
+              display: none !important;
+              visibility: hidden !important;
+            }
+
+            /* Asegurar que el contenido no llegue hasta la firma */
+            body {
+              margin-bottom: 0 !important;
+            }
+
+            .page.contract {
+              padding-bottom: 120px !important;
+            }
+
+            .contract {
+              padding-bottom: 120px !important;
+            }
+
+            body {
+              font-family: "Calibri", Times, serif !important;
+              font-size: 11pt !important;
+              line-height: 1.4 !important;
+              text-align: justify !important;
+              color: #000 !important;
+              background: none !important;
+            }
+
+            section, h4, h5, p, .keep-together {
+              <!-- page-break-inside: avoid !important; -->
+              <!-- break-inside: avoid !important; -->
+            }
+
+            h4, h5 {
+              page-break-after: avoid !important;
+              break-after: avoid !important;
+            }
+
+            table {
+              page-break-inside: auto !important;
+            }
+
+            tr, td, th {
+              page-break-inside: avoid !important;
+            }
+
+            .signature-section {
+              page-break-before: auto !important;
+              page-break-inside: avoid !important;
+            }
+
+            a {
+              color: #000 !important;
+              text-decoration: none !important;
+            }
+
+            img {
+              max-width: 100% !important;
+              height: auto !important;
+            }
+
+            .table-bordered td, .table-bordered th {
+              word-wrap: break-word;
+              overflow-wrap: break-word;
+            }
+
+            /* Clases de espaciado para evitar choque con firma - SOLO EN IMPRESIÓN */
+            .spacer {
+              display: block !important;
+              height: 80px !important;
+              clear: both !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+
+            .spacer-small {
+              display: block !important;
+              height: 40px !important;
+              clear: both !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+
+            .spacer-medium {
+              display: block !important;
+              height: 60px !important;
+              clear: both !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+
+            .spacer-large {
+              display: block !important;
+              height: 100px !important;
+              clear: both !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+
+            .line-break {
+              display: block !important;
+              clear: both !important;
+              height: 0 !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+
+            .signature-spacer {
+              display: block !important;
+              height: 120px !important;
+              page-break-inside: avoid !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+
+            /* Clase para ocultar la firma - parche blanco local SOLO DONDE SE USE */
+            .hide-footer-overlay {
+              display: none !important;
+            }
+
+            /* El overlay solo aparece en las páginas con clase no-footer - es un elemento del flujo */
+            .no-footer .hide-footer-overlay {
+              display: block !important;
+              position: relative !important;
+              width: 100% !important;
+              height: 120px !important;
+              background: white !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              margin-top: 50px !important;
+            }
+          }
+
+          @media screen {
+            .contract {
+              max-width: 290mm;
+              margin: 0 auto;
+              padding: 20px;
+            }
+
+            div.o_web_sign_signature_group div.card-header {
+                display: inherit !important;
+            }
+          }
+        </style>
+    </template>
+</odoo>

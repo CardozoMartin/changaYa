@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Modificar el reporte de proforma para cambiar nombre y archivo -->
+    <record id="sale.action_report_pro_forma_invoice" model="ir.actions.report">
+      <field name="name">Contrato</field>
+      <field name="print_report_name">'Contrato - %s' % (object.name)</field>
+    </record>
+
+    <!-- Herencia del reporte de proforma para mostrar el contrato completo -->
+    <template id="report_saleorder_pro_forma_inherit" inherit_id="sale.report_saleorder_pro_forma">
+      <xpath expr="//t[@t-call='sale.report_saleorder_document']" position="replace">
+        <!-- Llamamos directamente al template del contrato que ya existe -->
+        <t t-call="insurance_api.report_saleorder_contract_document"/>
+    </xpath>
+  </template>
+
+  <template id="report_saleorder_document_inherit" inherit_id="sale.report_saleorder_document">
+    <xpath expr="//div[hasclass('page')]" position="inside">
+      <t t-if="doc.payment_schedule_lines">
+        <div class="page-break-avoid" style="margin-top: 30px;">
+          <h4 style="padding-bottom: 5px; margin-bottom: 15px;">
+            <strong>Términos de pago</strong>
+          </h4>
+          <div style="margin-bottom: 15px;">
+            <p style="margin: 0; font-size: 14px;">
+                <strong>Plan de Pago:</strong>
+            </p>
+            <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">
+                <t t-esc="doc.get_payment_summary()"/>
+            </p>
+          </div>
+          <div>
+            <p style="margin-bottom: 10px;">
+              <i class="fa fa-calendar" style="margin-right: 8px;"/>
+              <strong>Detalle de Cuotas</strong>
+            </p>
+            <table class="table table-sm table-bordered" style="margin-bottom: 0;">
+              <thead style="background-color: #f0f0f0;">
+                <tr>
+                  <th style="padding: 8px; text-align: left; border: 1px solid #dee2e6;">Cuota N°</th>
+                  <th style="padding: 8px; text-align: left; border: 1px solid #dee2e6;">Vencimiento</th>
+                  <th style="padding: 8px; text-align: right; border: 1px solid #dee2e6;">Monto</th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-foreach="doc.payment_schedule_lines" t-as="line">
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #dee2e6;">
+                                            Cuota <t t-esc="line.installment_number"/>
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #dee2e6;">
+                      <span t-field="line.due_date"/>
+                    </td>
+                    <td style="padding: 8px; text-align: right; border: 1px solid #dee2e6;">
+                      <strong>
+                        <span t-field="line.amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                      </strong>
+                    </td>
+                  </tr>
+                </t>
+              </tbody>
+              <tfoot style="background-color: #f0f0f0;">
+                <tr>
+                  <th colspan="2" style="padding: 8px; text-align: right; border: 1px solid #dee2e6;">Total:</th>
+                  <th style="padding: 8px; text-align: right; border: 1px solid #dee2e6;">
+                    <strong>
+                      <span t-field="doc.payment_schedule_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                    </strong>
+                  </th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </t>
+    </xpath>
+  </template>
+  </data>
+</odoo>

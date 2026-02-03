@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_payment_schedule_line_list" model="ir.ui.view">
+        <field name="name">sale.order.payment.schedule.line.list</field>
+        <field name="model">sale.order.payment.schedule.line</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="installment_number" string="Nº"/>
+                <field name="due_date" string="Fecha Vencimiento"/>
+                <field name="base_amount" column_invisible="True"/>
+                <field name="amount" string="Monto" sum="Total"/>
+                <field name="interest_rate" string="Interés (%)"/>
+                <field name="discount_rate" string="Descuento (%)"/>
+                <field name="payment_status" string="Estado"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_payment_schedule_line_form" model="ir.ui.view">
+        <field name="name">sale.order.payment.schedule.line.form</field>
+        <field name="model">sale.order.payment.schedule.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="installment_number"/>
+                    <field name="due_date"/>
+                    <field name="amount"/>
+                    <field name="payment_status"/>
+                    <field name="interest_rate"/>
+                    <field name="discount_rate"/>
+                    <field name="notes"/>
+                </group>
+            </form>
+        </field>
+    </record>
+    <record id="sale_order_form_inherit_payment_schedule" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.payment.schedule</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Cuotas" name="payment_management">
+                    <field name="payment_schedule_lines" readonly="state not in ['draft', 'sent']" mode="list"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
