@@ -2,7 +2,7 @@ import { useAuthSessionStore } from "@/store/authSessionStore";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://6a420039deea.ngrok-free.app/api/v1",
+  baseURL: "https://6afa31a21446.ngrok-free.app/api/v1",
   headers: {
     "Content-Type": "application/json",
   },

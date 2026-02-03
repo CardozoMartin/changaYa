@@ -25,10 +25,10 @@ const BottomTabBar = ({ activeTab = 'profile', onTabPress }: BottomTabBarProps) 
         </Text>
       </TouchableOpacity>
 
-      {/* Search Tab */}
+      {/* MisChangas Tab (search) */}
       <TouchableOpacity style={styles.tabButton} onPress={() => onTabPress?.('search')}>
         <Ionicons 
-          name={activeTab === 'search' ? 'search' : 'search-outline'} 
+          name={activeTab === 'search' ? 'list' : 'list-outline'} 
           size={26} 
           color={activeTab === 'search' ? '#1E3A8A' : '#9CA3AF'} 
         />
@@ -36,7 +36,7 @@ const BottomTabBar = ({ activeTab = 'profile', onTabPress }: BottomTabBarProps) 
           styles.tabLabel, 
           activeTab === 'search' && styles.activeTabLabel
         ]}>
-          Buscar
+          MisChangas
         </Text>
       </TouchableOpacity>
 

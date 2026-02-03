@@ -50,6 +50,7 @@ function RootContent() {
           const mapToKey = (name: string) => {
             if (name === 'HomeScreen') return 'home';
             if (name === 'OpportunitiesScreen') return 'search';
+            if (name === 'MisChangasPublicadasScreen') return 'search';
             if (name === 'ProfileScreen') return 'profile';
             return 'home';
           };
@@ -57,7 +58,7 @@ function RootContent() {
           // Handler for tab presses
           const handlePress = (key: 'home' | 'search' | 'create' | 'messages' | 'profile') => {
             if (key === 'home') props.navigation.navigate('HomeScreen');
-            else if (key === 'search') props.navigation.navigate('OpportunitiesScreen');
+            else if (key === 'search') props.navigation.navigate('MisChangasPublicadasScreen');
             else if (key === 'profile') props.navigation.navigate('ProfileScreen');
             else if (key === 'create') props.navigation.navigate('PublishJobScreen');
             else if (key === 'messages') props.navigation.navigate('HomeScreen');
@@ -87,6 +88,12 @@ function RootContent() {
           name="ProfileScreen"
           options={{
             title: 'Perfil'
+          }}
+        />
+        <Tabs.Screen
+          name="MisChangasPublicadasScreen"
+          options={{
+            title: 'MisChangas'
           }}
         />
       </Tabs>

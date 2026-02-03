@@ -450,7 +450,7 @@ const CompleteProfileScreen = () => {
             {/* Location Input - Controlado por react-hook-form con GeoRef */}
             <Controller
               control={control}
-              name="location"
+              name="address"
               rules={{
                 required: 'La ubicación es requerida',
                 minLength: {
@@ -472,7 +472,7 @@ const CompleteProfileScreen = () => {
                   <LocationCascadeInput
                     value={value ?? ''}
                     onChangeLocation={onChange}
-                    error={errors.location?.message}
+                    error={errors.address?.message}
                     onFocus={() => {
                       // Un solo scroll suave después de que el teclado esté visible
                       setTimeout(() => {

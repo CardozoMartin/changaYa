@@ -1,6 +1,9 @@
+import { useAuthSessionStore } from "@/store/authSessionStore";
 import { Ionicons } from "@expo/vector-icons";
-import React, { use } from "react";
+import { router } from "expo-router";
+import React from "react";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -8,15 +11,14 @@ import {
   View,
 } from "react-native";
 import { useGetProfileData } from "../../hooks/useAuth";
-import { useAuthSessionStore } from "@/store/authSessionStore";
-import { router } from "expo-router";
 
 const ProfileScreen = () => {
   //hook para obtener informacion del pefil
   const { data: profileData, isLoading, error } = useGetProfileData();
   const dataUSer = profileData?.data ?? null;
   const { clearAuth } = useAuthSessionStore();
-
+ 
+console.log("hola mundo desde profile screen");
   const handleLogout = () => {
     clearAuth();
     // Aquí puedes agregar navegación a la pantalla de inicio de sesión si es necesario
@@ -62,13 +64,20 @@ const ProfileScreen = () => {
       <View style={styles.profileSection}>
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
+          {dataUSer?.imageProfile ? (
+            <Image
+              source={{ uri: dataUSer?.imageProfile }}
+              style={styles.avatarImage}
+              resizeMode="cover"
+            />
+          ) : (
             <Ionicons name="person" size={80} color="#D4A574" />
-          </View>
-          <TouchableOpacity style={styles.editButton}>
-            <Ionicons name="pencil" size={18} color="#fff" />
-          </TouchableOpacity>
+          )}
         </View>
-
+        <TouchableOpacity style={styles.editButton}>
+          <Ionicons name="camera" size={18} color="#fff" />
+        </TouchableOpacity>
+      </View>
         <Text style={styles.userName}>
           {dataUSer?.fullName || "Marcos García"}
         </Text>
@@ -363,6 +372,12 @@ const styles = StyleSheet.create({
     borderColor: "#FCD34D",
     justifyContent: "center",
     alignItems: "center",
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 70,
   },
   editButton: {
     position: "absolute",
