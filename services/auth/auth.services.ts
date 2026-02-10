@@ -82,8 +82,18 @@ export const postAuthLoginFn = async (
     });
     console.log("Respuesta del login:", res.data);
     return res.data;
-  } catch (error) {
-    throw error;
+  } catch (error: any) {
+    // Log full error for debugging
+    console.error('[postAuthLoginFn] Error completo:', {
+      message: error?.message,
+      response: error?.response?.data,
+      status: error?.response?.status,
+    });
+    // Normalizar mensaje para que los handlers puedan leerlo de manera consistente
+    const serverMessage = error?.response?.data?.message ?? error?.message ?? 'Error desconocido en login';
+    const normalized: any = new Error(serverMessage);
+    normalized.response = error?.response;
+    throw normalized;
   }
 };
 export const postAuthGoogleLoginFn = async (data: {
@@ -127,3 +137,12 @@ export const getProfileDataFn = async (): Promise<any> => {
     throw error;
   }
 };
+//funcion para obtener los datos de un usuario por el id
+export const getUserByIdFn = async (id: string): Promise<any> => {
+  try {
+    const res = await api.get(`/users/${id}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}

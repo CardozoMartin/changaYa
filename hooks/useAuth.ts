@@ -38,40 +38,58 @@ export const useVerifyAccount = () => {
 }
 
 //hook para hacer login
-export const useAuthLogin = () => {
+export const useAuthLogin = (options?: {
+  onLoginSuccess?: (data: any) => void | Promise<void>;
+}) => {
   return useMutation({
     mutationFn: ({ email, password, idGoogle }: { email?: string; password?: string; idGoogle?: string }) =>
       postAuthLoginFn(email, password, idGoogle),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       useAuthSessionStore.getState().setAuth(data.token, data.user);
-      console.warn('useAuthLogin onSuccess - full data:', data);
-      console.warn('useAuthLogin - user keys:', Object.keys(data.user || {}));
+     
+      
+      // ✅ Ejecutar callback personalizado si existe
+      if (options?.onLoginSuccess) {
+        await options.onLoginSuccess(data);
+      }
     },
     onError: (error: any) => {
-      console.error('Error en login:', error.response?.data?.message);
+      // Mejor logging para entender la estructura del error
+      const serverMessage = error?.response?.data?.message;
+     
     },
   });
 };
 //hook para iniciar session con google
-export const useAuthLoginWithGoogle = () => {
+export const useAuthLoginWithGoogle = (options?: {
+  onLoginSuccess?: (data: any) => void | Promise<void>;
+}) => {
+  console.log('🔧 [useAuthLoginWithGoogle] Hook inicializado con callback:', typeof options?.onLoginSuccess);
   return useMutation({
-    mutationFn: (data: { fullName?: string; email?: string; address?: string; phone?: string; idGoogle?: string }) =>
-      postAuthGoogleLoginFn(data),
-    onSuccess: (data) => {
+    mutationFn: (data: { fullName?: string; email?: string; address?: string; phone?: string; idGoogle?: string }) => {
+      console.log('📡 [useAuthLoginWithGoogle] mutationFn ejecutada con data:', data);
+      return postAuthGoogleLoginFn(data);
+    },
+    onSuccess: async (data) => {
+      console.log('🎉 [useAuthLoginWithGoogle] onSuccess EJECUTADO!');
+      console.log('🎉 [useAuthLoginWithGoogle] Data recibida:', data);
+      
       useAuthSessionStore.getState().setAuth(data.token, data.user);
-      console.log('✅ Token guardado en store:', data.token ? 'SÍ' : 'NO');
-      console.log('✅ Usuario guardado en store:', data.user?.email);
-      console.log('📊 Datos completos recibidos:', {
-        token: data.token?.substring(0, 20) + '...',
-        userId: data.user?.id,
-        email: data.user?.email,
-        profileCompleted: data.user?.profileCompleted,
-        acceptTerms: data.user?.acceptTerms,
-      });
+      console.log('✅ [useAuthLoginWithGoogle] Token guardado en store (Google):', data.token ? 'SÍ' : 'NO');
+      console.log('✅ [useAuthLoginWithGoogle] Usuario guardado en store (Google):', data.user?.email);
+      
+      // ✅ Ejecutar callback personalizado si existe
+      if (options?.onLoginSuccess) {
+        console.log('🔄 [useAuthLoginWithGoogle] Ejecutando callback personalizado...');
+        await options.onLoginSuccess(data);
+        console.log('✅ [useAuthLoginWithGoogle] Callback finalizado');
+      } else {
+        console.log('⚠️ [useAuthLoginWithGoogle] NO HAY CALLBACK para ejecutar');
+      }
     },
     onError: (error: any) => {
-      console.error('❌ Error en login con Google:', error.response?.data?.message || error.message);
-      console.error('❌ Detalles del error:', error.response?.data);
+      console.error('❌ [useAuthLoginWithGoogle] onError EJECUTADO:', error.response?.data?.message || error.message);
+      console.error('❌ [useAuthLoginWithGoogle] Detalles del error:', error.response?.data);
     },
   });
 };

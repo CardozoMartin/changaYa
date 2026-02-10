@@ -1,11 +1,11 @@
 import CustomAlert from "@/components/ui/CustomAlert";
 import { useAuthLogin } from "@/hooks/useAuth";
 import { useCustomAlert } from "@/hooks/useCustomAlert";
+import { checkWorksActiveFn } from "@/services/auth/work.services";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -17,13 +17,127 @@ import BtnGoogle from "./BtnGoogle";
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  // Custom Alert Hook
+  
   const { alertConfig, isVisible, hideAlert, showSuccess, showError } =
     useCustomAlert();
+  
+  // Callback personalizado para manejar el login exitoso
+  const handleLoginSuccess = async (responseData: any) => {
+    
+    
+    // ⏳ Esperar a que el token se guarde
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    try {
+     
+      
+      // ✅ Llamar directamente a la función
+      const workData = await checkWorksActiveFn();
+      console.log('✅ checkWorksActiveFn response:', workData);
+      const role = workData?.role;
+      let status:boolean = false;
+      const workerId = workData?.workerId;
+      const employerId = workData?.employerId;
+      const workId = workData?.workId;
 
-  const { mutate: loginMutate, isPending, isError } = useAuthLogin();
+      if(role === 'worker'){
+         status = workData?.completionStatus.workerConfirmed;
+         if(status === false){
+         router.push({
+            pathname: "/(tabs)/Rateworkerscreen",
+            params: {
+              employerId,
+              workId,
+              workerId
+            }
+          });
+          return;
+         }
+      } else if(role === 'employer'){
+        status = workData?.completionStatus.employerConfirmed;
+        if(status === false){
+         
+            router.push({
+            pathname: "/(tabs)/Rateworkerscreen",
+            params: {
+              workerId,
+              workId,
+              employerId
+            }
+          });
+          return;
+         }
+      }
+     
+     
+     
+     
+      
+      if (workData?.works && Array.isArray(workData.works) && workData.works.length > 0) {
+        const activeWork = workData.works[0];
+        
+       
+        
+        if (activeWork.status === "in_progress") {
+          showSuccess(
+            "¡Bienvenido de nuevo!", 
+            `Tienes un trabajo pendiente: "${activeWork.workTitle}"`, 
+            {
+              customImage: require("../../assets/images/welcome.png"),
+              imageStyle: { width: 500, height: 300 },
+              primaryButtonText: "Finalizar Trabajo",
+              onPrimaryPress: () => {
+                hideAlert();
+                router.push({
+                  pathname: "/(tabs)/RateEmployerScreen",
+                  params: { 
+                    workId: activeWork.workId,
+                    applicationId: activeWork.applicationId,
+                    workTitle: activeWork.workTitle
+                  }
+                });
+              },
+            }
+          );
+          return;
+        }
+      }
+      
+    } catch (workError: any) {
+      
+    }
+    
+    // FLUJO NORMAL...
+    const profileCompleted = responseData?.user?.profileCompleted;
+    const acceptTerms = responseData?.user?.acceptTerms;
+    
+    if (profileCompleted && acceptTerms) {
+      showSuccess("¡Inicio de sesión exitoso!", "Bienvenido de nuevo.", {
+        customImage: require("../../assets/images/welcome.png"),
+        imageStyle: { width: 500, height: 300 },
+        primaryButtonText: "Continuar",
+        onPrimaryPress: () => {
+          hideAlert();
+          router.push("/(tabs)/HomeScreen");
+        },
+      });
+    } else {
+      showSuccess("¡Inicio de sesión exitoso!", "Completa tu perfil.", {
+        customImage: require("../../assets/images/welcome.png"),
+        imageStyle: { width: 500, height: 300 },
+        primaryButtonText: "Completar Perfil",
+        onPrimaryPress: () => {
+          hideAlert();
+          router.push("/(tabs)/OnboardingScreen");
+        },
+      });
+    }
+  };
+  
+  const { mutate: loginMutate, isPending, isError } = useAuthLogin({
+    onLoginSuccess: handleLoginSuccess,
+  });
 
-  //RHF ----- Para manejo de formularios
   const {
     control,
     handleSubmit: onSubmitRHF,
@@ -33,55 +147,20 @@ export default function LoginForm() {
     defaultValues: {
       email: "",
       password: "",
-      fullName: "",
-      phone: "",
-      address: "",
     },
     mode: "onChange",
   });
 
-  //handlers ---- para manejar eventos
   const handleLogin = (data: { email: string; password: string }) => {
+    console.log("🟡 handleLogin llamado con:", data.email);
     loginMutate(
       { email: data.email, password: data.password },
       {
-        onSuccess: (responseData) => {
-          console.warn("Login exitoso (LoginForm):", responseData);
-          // Mostrar alerta para confirmar que onSuccess se ejecutó (visible en móvil)
-          try {
-            Alert.alert("Login ejecutado", JSON.stringify(responseData.user || {}, null, 2));
-          } catch (e) {
-            console.warn("No se pudo mostrar alert con el user:", e);
-          }
-          // Verificar si perfil está completo y términos aceptados
-          const profileCompleted = responseData?.user?.profileCompleted;
-          const acceptTerms = responseData?.user?.acceptTerms;
-          console.warn('Campos usuario:', { profileCompleted, acceptTerms, userKeys: Object.keys(responseData?.user || {}) });
-          if (profileCompleted && acceptTerms) {
-            // Ir directamente a HomeScreen
-            showSuccess("¡Inicio de sesión exitoso!", `Bienvenido de nuevo.`, {
-              customImage: require("../../assets/images/welcome.png"),
-              imageStyle: { width: 500, height: 300 },
-              primaryButtonText: "Continuar",
-              onPrimaryPress: () => {
-                router.push("/(tabs)/HomeScreen");
-              },
-            });
-          } else {
-            // Ir a Terms and Privacy Screen
-            showSuccess("¡Inicio de sesión exitoso!", `Bienvenido de nuevo.`, {
-              customImage: require("../../assets/images/welcome.png"),
-              imageStyle: { width: 500, height: 300 },
-              primaryButtonText: "Continuar",
-              onPrimaryPress: () => {
-                console.warn('Navegando a onboarding. profileCompleted:', profileCompleted, 'acceptTerms:', acceptTerms);
-                router.push("/(tabs)/OnboardingScreen");
-              },
-            });
-          }
-        },
         onError: (error: any) => {
-          if (error.response.data.message === "El usuario no está activo") {
+          const serverMessage = error?.response?.data?.message ?? error?.message ?? null;
+          console.warn('❌ Login failed - serverMessage:', serverMessage);
+
+          if (serverMessage === "El usuario no está activo") {
             showError(
               "",
               "La cuenta no está verificada. Por favor, verifica tu correo electrónico.",
@@ -91,6 +170,10 @@ export default function LoginForm() {
                 primaryButtonText: "Reintentar",
               }
             );
+          } else if (serverMessage) {
+            showError("", serverMessage, {
+              primaryButtonText: "Reintentar",
+            });
           } else {
             showError("", "Contraseña o correo electrónico incorrectos.", {
               customImage: require("../../assets/images/credencialesinvalidas.png"),
@@ -346,6 +429,12 @@ const styles = StyleSheet.create({
     color: "#2D3748",
     borderWidth: 1,
     borderColor: "#E8E8E8",
+  },
+  errorText: {
+    fontSize: 13,
+    color: "#EF4444",
+    marginTop: 6,
+    marginLeft: 4,
   },
   passwordContainer: {
     flexDirection: "row",

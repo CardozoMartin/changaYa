@@ -1,20 +1,22 @@
 import { createClient } from "@supabase/supabase-js";
 import * as WebBrowser from "expo-web-browser";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    Alert,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { useAuthLoginWithGoogle } from "@/hooks/useAuth";
 import { useCustomAlert } from "@/hooks/useCustomAlert";
+import { checkWorksActiveFn } from "@/services/auth/work.services";
+
 import * as Linking from "expo-linking";
-import { router } from "expo-router";
-import { useAuthSessionStore } from "@/store/authSessionStore";
+import { useRouter } from "expo-router";
+
 // Completa el proceso de autenticación si la aplicación fue abierta desde un navegador web
 WebBrowser.maybeCompleteAuthSession();
 
@@ -27,10 +29,137 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function BtnGoogle({ loading: externalLoading = false } = {}) {
   const [loading, setLoading] = useState(externalLoading);
-  const { mutate: postLoginGoogle } = useAuthLoginWithGoogle();
   const [deepLink, setDeepLink] = useState(null);
+  const router = useRouter();
+  
   const { alertConfig, isVisible, hideAlert, showSuccess, showError } =
     useCustomAlert();
+
+  // Callback personalizado que se ejecuta cuando el login es exitoso
+  const handleGoogleLoginSuccess = async (responseData: any) => {
+    console.log("🟢 [BtnGoogle] Callback ejecutado");
+    console.log("✅ Token recibido:", responseData?.token?.substring(0, 20) + "...");
+    console.log("✅ Usuario recibido:", responseData?.user);
+    
+    // ⏳ Esperar a que el token se guarde
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    try {
+      // ✅ Llamar directamente a la función para verificar trabajos
+      const workData = await checkWorksActiveFn();
+      console.log('✅ [BtnGoogle] checkWorksActiveFn response:', workData);
+      
+      // 🔥 VERIFICAR SI HAY TRABAJOS ACTIVOS
+      if (workData?.hasActiveWork && workData?.works && workData.works.length > 0) {
+        const activeWork = workData.works[0]; // Primer trabajo activo
+        const role = workData.role;
+        const completionStatus = activeWork.completionStatus;
+        const workerId = activeWork.workerId;
+        const employerId = activeWork.employerId;
+        const workId = activeWork.workId;
+        
+        console.log('🔍 [BtnGoogle] Trabajo activo encontrado:', {
+          role,
+          status: activeWork.status,
+          completionStatus,
+          workId
+        });
+
+        // 🔥 VERIFICAR SI ES WORKER Y TIENE TRABAJO PENDIENTE DE CONFIRMAR
+        if (role === 'worker' && completionStatus?.workerConfirmed === false) {
+          console.log('🔄 [BtnGoogle] Redirigiendo a Rateworkerscreen (worker)');
+          setLoading(false);
+          router.push({
+            pathname: "/(tabs)/Rateworkerscreen",
+            params: {
+              employerId,
+              workId,
+              workerId
+            }
+          });
+          return;
+        } 
+        // 🔥 VERIFICAR SI ES EMPLOYER Y TIENE TRABAJO PENDIENTE DE CONFIRMAR
+        else if (role === 'employer' && completionStatus?.employerConfirmed === false) {
+          console.log('🔄 [BtnGoogle] Redirigiendo a Rateworkerscreen (employer)');
+          setLoading(false);
+          router.push({
+            pathname: "/(tabs)/Rateworkerscreen",
+            params: {
+              workerId,
+              workId,
+              employerId
+            }
+          });
+          return;
+        }
+        
+        // 🔥 VERIFICAR SI HAY TRABAJOS EN PROGRESO
+        if (activeWork.status === "in_progress") {
+          console.log('🔄 [BtnGoogle] Trabajo en progreso detectado');
+          setLoading(false);
+          showSuccess(
+            "¡Bienvenido de nuevo!", 
+            `Tienes un trabajo pendiente: "${activeWork.workTitle}"`, 
+            {
+              customImage: require("../../assets/images/welcome.png"),
+              imageStyle: { width: 500, height: 300 },
+              primaryButtonText: "Finalizar Trabajo",
+              onPrimaryPress: () => {
+                hideAlert();
+                router.push({
+                  pathname: "/(tabs)/RateEmployerScreen",
+                  params: { 
+                    workId: activeWork.workId,
+                    applicationId: activeWork.applicationId,
+                    workTitle: activeWork.workTitle
+                  }
+                });
+              },
+            }
+          );
+          return;
+        }
+      }
+      
+    } catch (workError: any) {
+      console.log('⚠️ [BtnGoogle] Error verificando trabajos:', workError);
+      // Continuar con flujo normal si hay error
+    }
+    
+    // 🔥 FLUJO NORMAL - Redirigir según perfil
+    setLoading(false);
+    const profileCompleted = responseData?.user?.profileCompleted;
+    const acceptTerms = responseData?.user?.acceptTerms;
+    
+    if (profileCompleted && acceptTerms) {
+      console.log('✅ [BtnGoogle] Perfil completo, redirigiendo a HomeScreen');
+      showSuccess("¡Inicio de sesión exitoso!", "Bienvenido de nuevo.", {
+        customImage: require("../../assets/images/welcome.png"),
+        imageStyle: { width: 500, height: 300 },
+        primaryButtonText: "Continuar",
+        onPrimaryPress: () => {
+          hideAlert();
+          router.push("/(tabs)/HomeScreen");
+        },
+      });
+    } else {
+      console.log('⚠️ [BtnGoogle] Perfil incompleto, redirigiendo a OnboardingScreen');
+      showSuccess("¡Inicio de sesión exitoso!", "Completa tu perfil.", {
+        customImage: require("../../assets/images/welcome.png"),
+        imageStyle: { width: 500, height: 300 },
+        primaryButtonText: "Completar Perfil",
+        onPrimaryPress: () => {
+          hideAlert();
+          router.push("/(tabs)/OnboardingScreen");
+        },
+      });
+    }
+  };
+
+  const { mutate: postLoginGoogle } = useAuthLoginWithGoogle({
+    onLoginSuccess: handleGoogleLoginSuccess,
+  });
 
   //Escuchar deep Links para capturar la respuesta de OAuth
   useEffect(() => {
@@ -50,6 +179,15 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
   }, []);
 
   const handleDeepLink = async ({ url }) => {
+    console.log('🔗 [handleDeepLink] URL recibida:', url);
+    
+    // ⚠️ IMPORTANTE: Solo procesar si estamos en proceso de login
+    // Esto evita que se procese automáticamente al abrir la app después de logout
+    if (!loading) {
+      console.log('⚠️ [handleDeepLink] No hay login en curso, ignorando deep link');
+      return;
+    }
+    
     setDeepLink(url);
 
     // Procesar la URL si contiene tokens (formato hash o query params)
@@ -92,19 +230,17 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
               error: userError,
             } = await supabase.auth.getUser();
 
-            console.log(user)
+            console.log("👤 Usuario de Supabase:", user);
 
             if (userError) {
               console.error("❌ Error al obtener usuario:", userError);
               Alert.alert(
                 "Error",
-                "No se pudo obtener la información del usuario",
+                "No se pudo obtener la información del usuario"
               );
               setLoading(false);
               return;
             }
-
-            console.log("👤 Usuario obtenido:", user);
 
             const userData = {
               email: user.email,
@@ -112,80 +248,32 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
               fullName: user.user_metadata.full_name,
             };
 
-            console.log("🚀 Enviando datos al backend:", userData);
-           postLoginGoogle(userData, {
-  onSuccess: (responseData) => {
-    console.log("✅ Login con Google exitoso:", responseData);
-    console.log("✅ Token recibido:", responseData?.token?.substring(0, 20) + '...');
-    console.log("✅ Usuario recibido:", responseData?.user);
-    
-    // Verificar que el token se guardó en el store
-    const storeState = useAuthSessionStore.getState();
-    console.log("✅ Token en store después de login:", storeState.token ? 'SÍ' : 'NO');
-    console.log("✅ Usuario en store después de login:", storeState.user?.email);
-    
-    // Verificar si perfil está completo y términos aceptados
-    const profileCompleted = responseData?.user?.profileCompleted;
-    const acceptTerms = responseData?.user?.acceptTerms;
-    
-    console.log("👤 Estado del usuario:", {
-      profileCompleted,
-      acceptTerms,
-      userId: responseData?.user?.id,
-    });
-
-    // Resetear loading antes de navegar
-    setLoading(false);
-
-    if (profileCompleted && acceptTerms) {
-      // Ir directamente a HomeScreen
-      console.log("→ Navegando a HomeScreen");
-      showSuccess(
-        "¡Inicio de sesión exitoso!",
-        `Bienvenido de nuevo.`,
-        {
-          customImage: require("../../assets/images/welcome.png"),
-          imageStyle: { width: 500, height: 300 },
-          primaryButtonText: "Continuar",
-          onPrimaryPress: () => {
-            hideAlert();
-            router.replace("/(tabs)/HomeScreen");
-          },
-        },
-      );
-    } else {
-      // Ir a OnboardingScreen para completar perfil y/o aceptar términos
-      console.log("→ Navegando a OnboardingScreen");
-      showSuccess(
-        "¡Inicio de sesión exitoso!",
-        `Completa tu perfil para continuar.`,
-        {
-          customImage: require("../../assets/images/welcome.png"),
-          imageStyle: { width: 500, height: 300 },
-          primaryButtonText: "Continuar",
-          onPrimaryPress: () => {
-            hideAlert();
-            router.replace("/(tabs)/OnboardingScreen");
-          },
-        },
-      );
-    }
-  },
-  onError: (error) => {
-    console.error("❌ Error en login con Google:", error);
-    setLoading(false);
-    showError(
-      "Error de autenticación",
-      error.response?.data?.message || error.message || "No se pudo iniciar sesión con Google",
-    );
-  },
-});
+            console.log("🚀 [handleDeepLink] Enviando datos al backend:", userData);
+            console.log("📞 [handleDeepLink] Llamando a postLoginGoogle...");
+            
+            postLoginGoogle(userData, {
+              onSuccess: (data) => {
+                console.log("✅ [handleDeepLink] onSuccess inline ejecutado!");
+                console.log("✅ [handleDeepLink] Data recibida del backend:", data);
+                // El hook también tiene onSuccess que ejecutará el callback
+              },
+              onError: (error) => {
+                console.error("❌ [handleDeepLink] Error en login con Google:", error);
+                setLoading(false);
+                showError(
+                  "Error de autenticación",
+                  error.response?.data?.message ||
+                    error.message ||
+                    "No se pudo iniciar sesión con Google"
+                );
+              },
+            });
           }
         } else {
           console.error("❌ No se recibieron los tokens");
           Alert.alert(
             "Error",
-            "No se pudieron obtener los tokens de autenticación",
+            "No se pudieron obtener los tokens de autenticación"
           );
           setLoading(false);
         }
@@ -193,7 +281,7 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
         console.error("❌ Error procesando deep link:", error);
         Alert.alert(
           "Error",
-          "Error al procesar la autenticación: " + error.message,
+          "Error al procesar la autenticación: " + error.message
         );
         setLoading(false);
       }
@@ -243,7 +331,7 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
         // Intentar abrir el navegador - CRÍTICO para React Native
         const result = await WebBrowser.openAuthSessionAsync(
           data.url,
-          redirectUrl,
+          redirectUrl
         );
 
         console.log("🔍 Resultado de WebBrowser:", result);
@@ -267,6 +355,7 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
       setLoading(false);
     }
   };
+
   return (
     <TouchableOpacity
       style={styles.googleButton}
@@ -281,226 +370,14 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
           />
         </View>
       </View>
-      <Text style={styles.googleButtonText}>Continuar con Google</Text>
+      <Text style={styles.googleButtonText}>
+        {loading ? "Cargando..." : "Continuar con Google"}
+      </Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-  },
-  header: {
-    alignItems: "center",
-    marginTop: 18,
-    marginBottom: 30,
-  },
-  logoContainer: {
-    flexDirection: "column",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  logoBadge: {
-    width: 56,
-    height: 56,
-    backgroundColor: "#F4C542",
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  briefcaseIcon: {
-    width: 28,
-    height: 28,
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logoImage: {
-    width: 120,
-    height: 120,
-    resizeMode: "contain",
-  },
-  briefcaseHandle: {
-    position: "absolute",
-    top: 2,
-    left: 8,
-    width: 12,
-    height: 6,
-    borderWidth: 2.5,
-    borderColor: "#1E3A5F",
-    borderBottomWidth: 0,
-    borderTopLeftRadius: 3,
-    borderTopRightRadius: 3,
-  },
-  briefcaseBody: {
-    position: "absolute",
-    top: 7,
-    left: 2,
-    width: 24,
-    height: 18,
-    backgroundColor: "transparent",
-    borderWidth: 2.5,
-    borderColor: "#1E3A5F",
-    borderRadius: 3,
-  },
-  logoText: {
-    fontSize: 36,
-    fontWeight: "700",
-    color: "#1E3A5F",
-  },
-  tagline: {
-    fontSize: 16,
-    color: "#5A6C7D",
-    fontWeight: "500",
-  },
-  tabsContainer: {
-    flexDirection: "row",
-    marginBottom: 30,
-    backgroundColor: "#E8E8E8",
-    borderRadius: 12,
-    padding: 4,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 14,
-    alignItems: "center",
-    borderRadius: 10,
-  },
-  activeTab: {
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  tabText: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#8A8A8A",
-  },
-  activeTabText: {
-    color: "#1E3A5F",
-    fontWeight: "600",
-  },
-  formContainer: {
-    flex: 1,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#2D3748",
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    fontSize: 15,
-    color: "#2D3748",
-    borderWidth: 1,
-    borderColor: "#E8E8E8",
-  },
-  passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#E8E8E8",
-  },
-  passwordInput: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    fontSize: 15,
-    color: "#2D3748",
-  },
-  eyeButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  eyeIcon: {
-    width: 24,
-    height: 24,
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  eyeOuter: {
-    width: 22,
-    height: 14,
-    borderWidth: 2,
-    borderColor: "#8A8A8A",
-    borderRadius: 11,
-    position: "absolute",
-  },
-  eyeSlash: {
-    width: 26,
-    height: 2,
-    backgroundColor: "#8A8A8A",
-    transform: [{ rotate: "45deg" }],
-    position: "absolute",
-  },
-  forgotPasswordContainer: {
-    alignItems: "flex-end",
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    color: "#3B82C8",
-    fontWeight: "500",
-  },
-  loginButton: {
-    backgroundColor: "#1E3A5F",
-    borderRadius: 12,
-    paddingVertical: 18,
-    alignItems: "center",
-    marginBottom: 24,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  loginButtonText: {
-    color: "#FFFFFF",
-    fontSize: 17,
-    fontWeight: "600",
-  },
-  dividerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#D0D0D0",
-  },
-  dividerCircle: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#D0D0D0",
-    marginHorizontal: 12,
-  },
   googleButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -530,21 +407,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#2D3748",
-  },
-  termsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  termsText: {
-    fontSize: 13,
-    color: "#8A8A8A",
-  },
-  termsLink: {
-    fontSize: 13,
-    color: "#3B82C8",
-    fontWeight: "500",
   },
 });

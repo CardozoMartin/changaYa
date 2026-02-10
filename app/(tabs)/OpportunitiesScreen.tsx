@@ -16,6 +16,8 @@ import {
 import { useWork } from '@/hooks/useWork';
 import WorkOpportunitiesList from '@/components/Opportunities/WorkOpportunitiesList';
 import { useAuthSessionStore } from '@/store/authSessionStore';
+import WorkCardError from '@/components/Errors/WorkCardError';
+import CardWorksSkeletor from '@/components/Skeleton/CardWorksSkeletor';
 
 
 const OpportunitiesScreen = () => {
@@ -25,25 +27,25 @@ const OpportunitiesScreen = () => {
 
   const { data: works, isLoading, error } = useWork();
 
-  if(isLoading){
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Cargando oportunidades...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // if(isLoading){
+  //   return (
+  //     <SafeAreaView style={styles.container}>
+  //       <View style={styles.loadingContainer}>
+  //         <Text style={styles.loadingText}>Cargando oportunidades...</Text>
+  //       </View>
+  //     </SafeAreaView>
+  //   );
+  // }
 
-  if(error){
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.errorText}>Error al cargar oportunidades.</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // if(error){
+  //   return (
+  //     <SafeAreaView style={styles.container}>
+  //       <View style={styles.loadingContainer}>
+  //         <Text style={styles.errorText}>Error al cargar oportunidades.</Text>
+  //       </View>
+  //     </SafeAreaView>
+  //   );
+  // }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -129,6 +131,14 @@ const OpportunitiesScreen = () => {
         </View>
 
         {/* Content con scroll */}
+        {error && (
+          <WorkCardError />
+        )}
+        {isLoading && !error && (
+          <CardWorksSkeletor />
+        )}
+
+        {!isLoading && !error && (
         <ScrollView 
           style={styles.scrollContent}
           contentContainerStyle={styles.scrollContentContainer}
@@ -138,17 +148,24 @@ const OpportunitiesScreen = () => {
           <View style={styles.contentWrapper}>
             <Text style={styles.sectionTitle}>Oportunidades para ti</Text>
 
-            {/* Componente que maneja la lista de trabajos del backend */}
-            <WorkOpportunitiesList 
-              works={works} 
-              isLoading={isLoading} 
-              error={error} 
-            />
+            {works?.length > 0 ? (
+              <WorkOpportunitiesList 
+                works={works} 
+                isLoading={isLoading} 
+                error={error} 
+              />
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyTitle}>No hay oportunidades disponibles</Text>
+                <Text style={styles.emptyMessage}>Intenta ajustar tus filtros</Text>
+              </View>
+            )}
 
             {/* Espaciado adicional al final para que no choque con el menú */}
             <View style={styles.bottomSpacer} />
           </View>
         </ScrollView>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

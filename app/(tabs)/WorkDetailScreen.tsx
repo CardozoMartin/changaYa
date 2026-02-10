@@ -279,18 +279,16 @@ const WorkDetailScreen = ({ route }: any) => {
       </ScrollView>
 
       {/* Botón flotante - posicionado arriba del BottomTabBar */}
-      {workDetails.workIsActive && workDetails.worksIsOpen === 'open' && (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.sendButton}
-            activeOpacity={0.8}
-            onPress={handleApplyToWork}
-          >
-            <Ionicons name="send" size={20} color="#FFF" />
-            <Text style={styles.buttonText}>{isPending ? 'Postulando...' : 'Postularme'}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={styles.sendButton}
+          activeOpacity={0.8}
+          onPress={handleApplyToWork}
+        >
+          <Ionicons name="send" size={20} color="#FFF" />
+          <Text style={styles.buttonText}>{isPending ? 'Postulando...' : 'Postularme'}</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };

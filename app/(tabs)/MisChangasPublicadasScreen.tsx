@@ -1,3 +1,5 @@
+import WorkCardError from '@/components/Errors/WorkCardError';
+import CardWorksSkeletor from '@/components/Skeleton/CardWorksSkeletor';
 import { useGetProfileData } from '@/hooks/useAuth';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -20,15 +22,20 @@ interface Job {
   _id: string;
   title: string;
   description: string;
-  worksIsOpen: JobStatus;
+  status: JobStatus;
   imageWork: string[];
   createdAt: string;
   location: string;
   salary: number;
   requirements: string[];
-  workIsActive: boolean;
   employerId: string;
-  idUser: string;
+  selectedWorkerId?: string;
+  selectedApplicationId?: string;
+  workIsActive: boolean;
+  completionStatus?: {
+    employerConfirmed: boolean;
+    workerConfirmed: boolean;
+  };
   updatedAt: string;
   __v: number;
 }
@@ -43,7 +50,7 @@ const MisChangasPublicadasScreen = () => {
   console.log('Data del usuario en MisChangasPublicadasScreen:', dataUser);
 
   // Filtrar trabajos según el tab activo
-  const filteredJobs = dataUser.filter((job) => job.worksIsOpen === activeTab);
+  const filteredJobs = dataUser.filter((job) => job.status === activeTab);
 
   // Formatear fecha
   const formatDate = (dateString: string) => {
@@ -100,7 +107,7 @@ const MisChangasPublicadasScreen = () => {
   };
 
   const renderJobCard = (job: Job) => {
-    const statusConfig = getStatusConfig(job.worksIsOpen);
+    const statusConfig = getStatusConfig(job.status);
     const imageUrl = job.imageWork && job.imageWork.length > 0 
       ? job.imageWork[0] 
       : null;
@@ -185,7 +192,7 @@ const MisChangasPublicadasScreen = () => {
             </View>
 
             {/* Información específica según estado */}
-            {job.worksIsOpen === 'open' && (
+            {job.status === 'open' && (
               <View style={styles.infoRow}>
                 <View style={styles.peopleIcon}>
                   <View style={styles.personIconSmall} />
@@ -197,7 +204,7 @@ const MisChangasPublicadasScreen = () => {
               </View>
             )}
 
-            {job.worksIsOpen === 'in_progress' && (
+            {job.status === 'in_progress' && (
               <View style={styles.infoRow}>
                 <View style={styles.personIconContainer}>
                   <View style={styles.personHead} />
@@ -207,7 +214,7 @@ const MisChangasPublicadasScreen = () => {
               </View>
             )}
 
-            {job.worksIsOpen === 'closed' && (
+            {job.status === 'closed' && (
               <View style={styles.infoRow}>
                 <View style={styles.checkIconContainer}>
                   <View style={styles.checkMark} />
@@ -246,7 +253,7 @@ const MisChangasPublicadasScreen = () => {
           <TouchableOpacity
             style={[
               styles.actionButton,
-              job.worksIsOpen === 'closed' && styles.actionButtonSecondary,
+              job.status === 'closed' && styles.actionButtonSecondary,
             ]}
             onPress={() => {
               console.log('Ver detalles de:', job._id);
@@ -256,12 +263,12 @@ const MisChangasPublicadasScreen = () => {
             <Text 
               style={[
                 styles.actionButtonText,
-                job.worksIsOpen === 'closed' && styles.actionButtonTextSecondary
+                job.status === 'closed' && styles.actionButtonTextSecondary
               ]}
             >
-              {job.worksIsOpen === 'open' && 'Ver postulantes'}
-              {job.worksIsOpen === 'in_progress' && 'Gestionar trabajo'}
-              {job.worksIsOpen === 'closed' && 'Re-publicar'}
+              {job.status === 'open' && 'Ver postulantes'}
+              {job.status === 'in_progress' && 'Gestionar trabajo'}
+              {job.status === 'closed' && 'Re-publicar'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -269,39 +276,7 @@ const MisChangasPublicadasScreen = () => {
     );
   };
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1142d4" />
-          <Text style={styles.loadingText}>Cargando changas...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
-  // Error state
-  if (error) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" />
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorTitle}>Error al cargar las changas</Text>
-          <Text style={styles.errorMessage}>
-            {error?.message || 'Ocurrió un error inesperado'}
-          </Text>
-          <TouchableOpacity 
-            style={styles.retryButton}
-            onPress={() => window.location.reload()}
-          >
-            <Text style={styles.retryButtonText}>Reintentar</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -376,35 +351,44 @@ const MisChangasPublicadasScreen = () => {
       </View>
 
       {/* Lista de trabajos */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {filteredJobs.length > 0 ? (
-          filteredJobs.map((job) => renderJobCard(job))
-        ) : (
-          <View style={styles.emptyContainer}>
-            <View style={styles.emptyIcon}>
-              <View style={styles.emptyDocBody} />
-              <View style={styles.emptyDocLine1} />
-              <View style={styles.emptyDocLine2} />
+      {error && (
+        <WorkCardError />
+      )}
+
+      {isLoading && !error && (
+        <CardWorksSkeletor />
+      )}
+
+      {!isLoading && !error && (
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {filteredJobs.length > 0 ? (
+            filteredJobs.map((job) => renderJobCard(job))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <View style={styles.emptyIcon}>
+                <View style={styles.emptyDocBody} />
+                <View style={styles.emptyDocLine1} />
+                <View style={styles.emptyDocLine2} />
+              </View>
+              <Text style={styles.emptyTitle}>
+                No hay changas {getTabLabel(activeTab).toLowerCase()}
+              </Text>
+              <Text style={styles.emptyMessage}>
+                {activeTab === 'open' && 'Publica una nueva changa para empezar'}
+                {activeTab === 'in_progress' && 'Aquí aparecerán los trabajos en curso'}
+                {activeTab === 'closed' && 'Los trabajos finalizados aparecerán aquí'}
+              </Text>
             </View>
-            <Text style={styles.emptyTitle}>
-              No hay changas {getTabLabel(activeTab).toLowerCase()}
-            </Text>
-            <Text style={styles.emptyMessage}>
-              {activeTab === 'open' && 'Publica una nueva changa para empezar'}
-              {activeTab === 'in_progress' && 'Aquí aparecerán los trabajos en curso'}
-              {activeTab === 'closed' && 'Los trabajos finalizados aparecerán aquí'}
-            </Text>
-          </View>
-        )}
+          )}
 
-        {/* Espacio al final */}
-        <View style={{ height: 100 }} />
-      </ScrollView>
-
+          {/* Espacio al final */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      )}
       {/* Botón flotante para nueva changa */}
       <TouchableOpacity 
         style={styles.fab}

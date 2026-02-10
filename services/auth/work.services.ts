@@ -36,3 +36,17 @@ export const createWorkFn = async (workData: FormData): Promise<IWorkData> => {
         throw error;
     }
 }
+
+//funcion para saber si el usuario logueado tiene un trabajo activo
+export const checkWorksActiveFn = async (): Promise<any> => {
+    try {
+    
+        const res = await api.get('/works/isWorkOpen');
+       
+     
+        return res.data.data;
+    } catch (error: any) {
+      
+        throw error;
+    }
+}

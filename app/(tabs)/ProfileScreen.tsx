@@ -11,6 +11,16 @@ import {
   View,
 } from "react-native";
 import { useGetProfileData } from "../../hooks/useAuth";
+import ProfileSkeleton from "@/components/Skeleton/ProfileSkeleton";
+import ProfileError from "@/components/Errors/ProfileError";
+import { createClient } from "@supabase/supabase-js";
+
+// Configuración de Supabase
+const supabaseUrl = "https://mjuflmbpbpsltvbjuqzj.supabase.co";
+const supabaseAnonKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdWZsbWJwYnBzbHR2Ymp1cXpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NzQ5MzYsImV4cCI6MjA4MTE1MDkzNn0.4be5UDBeAS1PULHBqxnudo9-i3zOi4Ft5JDVICIhqpg";
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const ProfileScreen = () => {
   //hook para obtener informacion del pefil
@@ -19,35 +29,34 @@ const ProfileScreen = () => {
   const { clearAuth } = useAuthSessionStore();
  
 console.log("hola mundo desde profile screen");
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    console.log('🚪 [ProfileScreen] Cerrando sesión...');
+    
+    try {
+      // Limpiar sesión de Supabase (Google OAuth)
+      await supabase.auth.signOut();
+      console.log('✅ [ProfileScreen] Sesión de Supabase limpiada');
+    } catch (error) {
+      console.error('⚠️ [ProfileScreen] Error al cerrar sesión de Supabase:', error);
+    }
+    
+    // Limpiar sesión del store local
     clearAuth();
-    // Aquí puedes agregar navegación a la pantalla de inicio de sesión si es necesario
+    console.log('✅ [ProfileScreen] Sesión del store limpiada');
+    
+    // Redirigir a login
     router.replace('/auth/LoginScreen');
   }
 
   if (isLoading) {
     return (
-      <View
-        style={[
-          styles.container,
-          { justifyContent: "center", alignItems: "center" },
-        ]}
-      >
-        <Text>Cargando perfil...</Text>
-      </View>
+      <ProfileSkeleton />
     );
   }
 
   if (error) {
     return (
-      <View
-        style={[
-          styles.container,
-          { justifyContent: "center", alignItems: "center" },
-        ]}
-      >
-        <Text>Error al cargar el perfil.</Text>
-      </View>
+      <ProfileError />
     );
   }
   return (
