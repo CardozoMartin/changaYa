@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import {
   View,
@@ -7,13 +7,103 @@ import {
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  Image
+  Image,
+  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { checkWorksActiveFn } from '@/services/auth/work.services';
+import { useCustomAlert } from '@/hooks/useCustomAlert';
+import CustomAlert from '@/components/ui/CustomAlert';
 
 const HomeScreen = () => {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState('');
+  const { showSuccess, hideAlert, alertConfig, isVisible } = useCustomAlert();
+
+  // Verificar trabajos pendientes al montar el componente
+  useEffect(() => {
+    const checkPendingWorks = async () => {
+      try {
+        console.log('🏠 [HomeScreen] Verificando trabajos pendientes...');
+        const workData = await checkWorksActiveFn();
+        console.log('✅ [HomeScreen] workData completo:', JSON.stringify(workData, null, 2));
+        
+        // Verificar si hay trabajos
+        if (!workData?.works || workData.works.length === 0) {
+          console.log('✅ [HomeScreen] No hay trabajos pendientes');
+          return;
+        }
+
+        const role = workData.role;
+        const activeWork = workData.works[0];
+        
+        console.log('📋 [HomeScreen] Datos del trabajo:', {
+          role,
+          status: activeWork.status,
+          employerConfirmed: activeWork.completionStatus?.employerConfirmed,
+          workerConfirmed: activeWork.completionStatus?.workerConfirmed,
+        });
+
+        // Verificar trabajos pendientes de confirmación
+        if (role === 'worker' && activeWork.completionStatus?.workerConfirmed === false) {
+          console.log('→ [HomeScreen] Redirigiendo a Rateworkerscreen (worker puntúa a employer)');
+          router.replace({
+            pathname: "/(tabs)/Rateworkerscreen",
+            params: { 
+              employerId: activeWork.employerId,  // Worker puntúa al employer
+              workId: activeWork.workId
+            }
+          });
+          return;
+        }
+        
+        if (role === 'employer' && activeWork.completionStatus?.employerConfirmed === false) {
+          console.log('→ [HomeScreen] Redirigiendo a Rateworkerscreen (employer puntúa a worker)');
+          router.replace({
+            pathname: "/(tabs)/Rateworkerscreen",
+            params: { 
+              workerId: activeWork.workerId,  // Employer puntúa al worker
+              workId: activeWork.workId
+            }
+          });
+          return;
+        }
+
+        // Verificar trabajos en progreso
+        if (activeWork.status === "in_progress") {
+          console.log('→ [HomeScreen] Trabajo en progreso detectado');
+          showSuccess(
+            "¡Bienvenido de nuevo!", 
+            `Tienes un trabajo pendiente: "${activeWork.workTitle}"`, 
+            {
+              customImage: require("../../assets/images/welcome.png"),
+              imageStyle: { width: 500, height: 300 },
+              primaryButtonText: "Finalizar Trabajo",
+              onPrimaryPress: () => {
+                hideAlert();
+                router.replace({
+                  pathname: "/(tabs)/RateEmployerScreen",
+                  params: { 
+                    workId: activeWork.workId,
+                    applicationId: activeWork.applicationId,
+                    workTitle: activeWork.workTitle
+                  }
+                });
+              },
+            }
+          );
+          return;
+        }
+        
+        console.log('✅ [HomeScreen] No hay trabajos que requieran acción');
+      } catch (error) {
+        console.error('❌ [HomeScreen] Error verificando trabajos:', error);
+        // No mostrar error al usuario, simplemente continuar normalmente
+      }
+    };
+
+    checkPendingWorks();
+  }, []);
 
   const handleContinue = () => {
     if (selectedRole === 'contratar') {
@@ -135,6 +225,21 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* CustomAlert */}
+      {isVisible && alertConfig && (
+        <CustomAlert
+          visible={isVisible}
+          type={alertConfig.type}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          onClose={hideAlert}
+          primaryButtonText={alertConfig.primaryButtonText}
+          onPrimaryPress={alertConfig.onPrimaryPress}
+          customImage={alertConfig.customImage}
+          imageStyle={alertConfig.imageStyle}
+        />
+      )}
     </SafeAreaView>
   );
 };

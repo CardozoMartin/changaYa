@@ -1,7 +1,6 @@
 import CustomAlert from "@/components/ui/CustomAlert";
 import { useAuthLogin } from "@/hooks/useAuth";
 import { useCustomAlert } from "@/hooks/useCustomAlert";
-import { checkWorksActiveFn } from "@/services/auth/work.services";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -21,97 +20,13 @@ export default function LoginForm() {
   const { alertConfig, isVisible, hideAlert, showSuccess, showError } =
     useCustomAlert();
   
-  // Callback personalizado para manejar el login exitoso
+  // Callback simple - solo navegar a HomeScreen u Onboarding
   const handleLoginSuccess = async (responseData: any) => {
-    
-    
-    // ⏳ Esperar a que el token se guarde
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    try {
-     
-      
-      // ✅ Llamar directamente a la función
-      const workData = await checkWorksActiveFn();
-      console.log('✅ checkWorksActiveFn response:', workData);
-      const role = workData?.role;
-      let status:boolean = false;
-      const workerId = workData?.workerId;
-      const employerId = workData?.employerId;
-      const workId = workData?.workId;
-
-      if(role === 'worker'){
-         status = workData?.completionStatus.workerConfirmed;
-         if(status === false){
-         router.push({
-            pathname: "/(tabs)/Rateworkerscreen",
-            params: {
-              employerId,
-              workId,
-              workerId
-            }
-          });
-          return;
-         }
-      } else if(role === 'employer'){
-        status = workData?.completionStatus.employerConfirmed;
-        if(status === false){
-         
-            router.push({
-            pathname: "/(tabs)/Rateworkerscreen",
-            params: {
-              workerId,
-              workId,
-              employerId
-            }
-          });
-          return;
-         }
-      }
-     
-     
-     
-     
-      
-      if (workData?.works && Array.isArray(workData.works) && workData.works.length > 0) {
-        const activeWork = workData.works[0];
-        
-       
-        
-        if (activeWork.status === "in_progress") {
-          showSuccess(
-            "¡Bienvenido de nuevo!", 
-            `Tienes un trabajo pendiente: "${activeWork.workTitle}"`, 
-            {
-              customImage: require("../../assets/images/welcome.png"),
-              imageStyle: { width: 500, height: 300 },
-              primaryButtonText: "Finalizar Trabajo",
-              onPrimaryPress: () => {
-                hideAlert();
-                router.push({
-                  pathname: "/(tabs)/RateEmployerScreen",
-                  params: { 
-                    workId: activeWork.workId,
-                    applicationId: activeWork.applicationId,
-                    workTitle: activeWork.workTitle
-                  }
-                });
-              },
-            }
-          );
-          return;
-        }
-      }
-      
-    } catch (workError: any) {
-      
-    }
-    
-    // FLUJO NORMAL...
     const profileCompleted = responseData?.user?.profileCompleted;
     const acceptTerms = responseData?.user?.acceptTerms;
     
     if (profileCompleted && acceptTerms) {
+      // Ir a HomeScreen (verificará trabajos allá)
       showSuccess("¡Inicio de sesión exitoso!", "Bienvenido de nuevo.", {
         customImage: require("../../assets/images/welcome.png"),
         imageStyle: { width: 500, height: 300 },
@@ -122,6 +37,7 @@ export default function LoginForm() {
         },
       });
     } else {
+      // Ir a Onboarding
       showSuccess("¡Inicio de sesión exitoso!", "Completa tu perfil.", {
         customImage: require("../../assets/images/welcome.png"),
         imageStyle: { width: 500, height: 300 },

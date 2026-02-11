@@ -106,24 +106,17 @@ export const postAuthGoogleLoginFn = async (data: {
   try {
     console.log('[postAuthGoogleLoginFn] Enviando datos:', data);
     const res = await api.post("/users/googlelogin", data);
-    console.log('[postAuthGoogleLoginFn] Respuesta completa del servidor:', res.data);
+    console.log('[postAuthGoogleLoginFn] Respuesta del servidor:', res.data);
     
-    // ✅ AQUÍ ESTÁ EL FIX: extraer data.data porque el backend envuelve la respuesta
+    // ✅ Extraer data.data porque el backend envuelve la respuesta
     if (res.data.success && res.data.data) {
-      console.log('[postAuthGoogleLoginFn] Token y usuario extraídos:', {
-        token: res.data.data.token?.substring(0, 20) + '...',
-        user: res.data.data.user?.email
-      });
+      console.log('[postAuthGoogleLoginFn] Token y usuario extraídos correctamente');
       return res.data.data; // Retornar solo { token, user }
     }
     
     throw new Error('Respuesta inválida del servidor');
   } catch (error: any) {
-    console.error('[postAuthGoogleLoginFn] Error completo:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-    });
+    console.error('[postAuthGoogleLoginFn] Error:', error.message);
     throw error;
   }
 };

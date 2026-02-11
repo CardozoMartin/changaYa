@@ -94,6 +94,7 @@ export const useAuthLoginWithGoogle = (options?: {
   });
 };
 
+
 //hook para aceptar terminos y condiciones
 export const useAcceptTermsAndConditions = () => {
   return useMutation({
