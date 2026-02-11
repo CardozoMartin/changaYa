@@ -1,19 +1,19 @@
+import ProfileError from "@/components/Errors/ProfileError";
+import ProfileSkeleton from "@/components/Skeleton/ProfileSkeleton";
 import { useAuthSessionStore } from "@/store/authSessionStore";
 import { Ionicons } from "@expo/vector-icons";
+import { createClient } from "@supabase/supabase-js";
 import { router } from "expo-router";
 import React from "react";
 import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useGetProfileData } from "../../hooks/useAuth";
-import ProfileSkeleton from "@/components/Skeleton/ProfileSkeleton";
-import ProfileError from "@/components/Errors/ProfileError";
-import { createClient } from "@supabase/supabase-js";
 
 // Configuración de Supabase
 const supabaseUrl = "https://mjuflmbpbpsltvbjuqzj.supabase.co";
