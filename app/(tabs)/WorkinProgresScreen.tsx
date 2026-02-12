@@ -40,15 +40,8 @@ export default function WorkInProgressScreen({
   // Obtener parámetros de navegación
   const params = useLocalSearchParams();
   
-  console.log("📋 Parámetros recibidos en WorkInProgressScreen:");
-  console.log("   - workerId:", params?.workerId);
-  console.log("   - employerId:", params?.employerId);
-  console.log("   - workId:", params?.workId);
-  console.log("   - Todos los parámetros:", params);
-
   const handleContact = () => {
-    // Aquí iría la lógica para contactar al trabajador
-    console.log("Contactar trabajador");
+    // Implementar lógica de contacto (llamada, WhatsApp, etc.)
   };
 
   const handleViewMap = () => {

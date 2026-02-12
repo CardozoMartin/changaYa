@@ -57,7 +57,6 @@ export default function VerifyAccountScreen() {
           inputRefs.current[5]?.focus();
         }
       } catch (error) {
-        console.log('Error al leer portapapeles:', error);
       }
     };
     
@@ -115,7 +114,6 @@ export default function VerifyAccountScreen() {
     setTimer(45);
     setCode(['', '', '', '', '', '']);
     inputRefs.current[0]?.focus();
-    console.log('Código reenviado');
     // Aquí deberías llamar a tu API para reenviar el código
   };
 
@@ -123,7 +121,6 @@ export default function VerifyAccountScreen() {
   const handleVerify = () => {
     const verificationCode = code.join('');
     if (verificationCode.length === 6) {
-      console.log('Verificando código:', verificationCode);
       verifyAccount(
         { code: verificationCode },
         {
@@ -175,7 +172,6 @@ export default function VerifyAccountScreen() {
         inputRefs.current[Math.min(codeArray.length, 5)]?.focus();
       }
     } catch (error) {
-      console.log('Error al pegar:', error);
     }
   };
 

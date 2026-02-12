@@ -1,4 +1,5 @@
 import WorkCardError from '@/components/Errors/WorkCardError';
+import NotificationBell from '@/components/Notifications/NotificationBell';
 import CardWorksSkeletor from '@/components/Skeleton/CardWorksSkeletor';
 import { useGetProfileData } from '@/hooks/useAuth';
 import { router } from 'expo-router';
@@ -46,8 +47,6 @@ const MisChangasPublicadasScreen = () => {
   // Hook para obtener las changas publicadas
   const { data: profileData, isLoading, error } = useGetProfileData();
   const dataUser: Job[] = profileData?.data?.works ?? [];
-
-  console.log('Data del usuario en MisChangasPublicadasScreen:', dataUser);
 
   // Filtrar trabajos según el tab activo
   const filteredJobs = dataUser.filter((job) => job.status === activeTab);
@@ -256,8 +255,28 @@ const MisChangasPublicadasScreen = () => {
               job.status === 'closed' && styles.actionButtonSecondary,
             ]}
             onPress={() => {
-              console.log('Ver detalles de:', job._id);
-              // router.push(`/job-details/${job._id}`);
+              if (job.status === 'open') {
+                // Navegar a pantalla de postulados con el ID del trabajo
+                router.push({
+                  pathname: '/(tabs)/PostuladosScreen',
+                  params: {
+                    jobId: job._id,
+                    jobTitle: job.title
+                  }
+                });
+              } else if (job.status === 'in_progress') {
+                // Navegar a gestión de trabajo en progreso
+                router.push({
+                  pathname: '/(tabs)/WorkinProgresScreen',
+                  params: {
+                    workId: job._id,
+                    workTitle: job.title
+                  }
+                });
+              } else if (job.status === 'closed') {
+                // Lógica para re-publicar trabajo
+                // Aquí podrías navegar a PublishJobScreen con los datos precargados
+              }
             }}
           >
             <Text 
@@ -294,6 +313,7 @@ const MisChangasPublicadasScreen = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Mis Changas Publicadas</Text>
         <View style={styles.spacer} />
+          <NotificationBell iconColor="#1E3A5F" iconSize={26} />
       </View>
 
       {/* Tabs */}
@@ -393,7 +413,6 @@ const MisChangasPublicadasScreen = () => {
       <TouchableOpacity 
         style={styles.fab}
         onPress={() => {
-          console.log('Crear nueva changa');
           // router.push('/create-job');
         }}
       >
@@ -429,7 +448,7 @@ const MisChangasPublicadasScreen = () => {
 
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => console.log('Ir a Chats')}
+          onPress={() => {}}
         >
           <View style={styles.chatIcon}>
             <View style={styles.chatBubble} />
@@ -440,7 +459,7 @@ const MisChangasPublicadasScreen = () => {
 
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => console.log('Ir a Perfil')}
+          onPress={() => {}}
         >
           <View style={styles.profileIcon}>
             <View style={styles.profileHead} />

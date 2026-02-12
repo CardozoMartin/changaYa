@@ -14,6 +14,7 @@ import {
     View,
 } from "react-native";
 import { useGetProfileData } from "../../hooks/useAuth";
+import NotificationBell from "@/components/Notifications/NotificationBell";
 
 // Configuración de Supabase
 const supabaseUrl = "https://mjuflmbpbpsltvbjuqzj.supabase.co";
@@ -27,22 +28,16 @@ const ProfileScreen = () => {
   const { data: profileData, isLoading, error } = useGetProfileData();
   const dataUSer = profileData?.data ?? null;
   const { clearAuth } = useAuthSessionStore();
- 
-console.log("hola mundo desde profile screen");
   const handleLogout = async () => {
-    console.log('🚪 [ProfileScreen] Cerrando sesión...');
-    
+
     try {
       // Limpiar sesión de Supabase (Google OAuth)
       await supabase.auth.signOut();
-      console.log('✅ [ProfileScreen] Sesión de Supabase limpiada');
     } catch (error) {
-      console.error('⚠️ [ProfileScreen] Error al cerrar sesión de Supabase:', error);
     }
     
     // Limpiar sesión del store local
     clearAuth();
-    console.log('✅ [ProfileScreen] Sesión del store limpiada');
     
     // Redirigir a login
     router.replace('/auth/LoginScreen');
@@ -61,12 +56,19 @@ console.log("hola mundo desde profile screen");
   }
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
+      {/* Header con campanita */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Mi Perfil</Text>
-        <TouchableOpacity style={styles.settingsButton}>
-          <Ionicons name="settings-outline" size={28} color="#fff" />
-        </TouchableOpacity>
+        
+        <View style={styles.headerActions}>
+          {/* Campanita de notificaciones */}
+          <NotificationBell iconColor="#fff" iconSize={24} />
+          
+          {/* Botón de configuración */}
+          <TouchableOpacity style={styles.settingsButton}>
+            <Ionicons name="settings-outline" size={28} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Profile Section */}
@@ -362,6 +364,11 @@ const styles = StyleSheet.create({
   },
   settingsButton: {
     padding: 8,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   profileSection: {
     alignItems: "center",

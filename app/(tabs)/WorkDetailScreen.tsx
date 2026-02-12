@@ -32,7 +32,6 @@ const WorkDetailScreen = ({ route }: any) => {
   const id = route?.params?.id ?? (searchParams?.id as string);
   
   if (!id) {
-    console.warn('WorkDetailScreen: missing id param');
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
@@ -100,8 +99,6 @@ const WorkDetailScreen = ({ route }: any) => {
       </SafeAreaView>
     );
   }
-
-  console.log('Detalles del trabajo:', workDetails);
 
   // Función para formatear la fecha
   const formatDate = (dateString: string) => {

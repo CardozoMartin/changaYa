@@ -129,7 +129,6 @@ const WorkCard: React.FC<WorkCardProps> = ({ work }) => {
     : null;
 
   const handlePress = () => {
-    console.log('Ver detalles del trabajo con ID:', workId);
     // Navegar a la pantalla de detalles con el id
     router.push({ pathname: '/WorkDetailScreen', params: { id: workId } });
   };

@@ -68,13 +68,12 @@ export default function LoginForm() {
   });
 
   const handleLogin = (data: { email: string; password: string }) => {
-    console.log("🟡 handleLogin llamado con:", data.email);
+
     loginMutate(
       { email: data.email, password: data.password },
       {
         onError: (error: any) => {
           const serverMessage = error?.response?.data?.message ?? error?.message ?? null;
-          console.warn('❌ Login failed - serverMessage:', serverMessage);
 
           if (serverMessage === "El usuario no está activo") {
             showError(

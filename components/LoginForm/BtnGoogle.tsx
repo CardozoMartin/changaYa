@@ -71,11 +71,6 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
         const accessToken = params.get("access_token");
         const refreshToken = params.get("refresh_token");
 
-        console.log("🔑 Tokens recibidos:", {
-          accessToken: !!accessToken,
-          refreshToken: !!refreshToken,
-        });
-
         if (accessToken && refreshToken) {
           const { error: sessionError } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -83,7 +78,6 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
           });
 
           if (sessionError) {
-            console.error("❌ Error al establecer sesión:", sessionError);
             Alert.alert("Error", sessionError.message);
             setLoading(false);
           } else {
@@ -92,10 +86,7 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
               error: userError,
             } = await supabase.auth.getUser();
 
-            console.log(user)
-
             if (userError || !user) {
-              console.error("❌ Error al obtener usuario:", userError);
               Alert.alert(
                 "Error",
                 "No se pudo obtener la información del usuario",
@@ -104,18 +95,14 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
               return;
             }
 
-            console.log("👤 Usuario obtenido:", user);
-
             const userData = {
               email: user.email || '',
               idGoogle: user.id,
               fullName: user.user_metadata?.full_name || '',
             };
 
-            console.log("🚀 Enviando datos al backend:", userData);
             postLoginGoogle(userData, {
               onSuccess: (responseData) => {
-                console.log("✅ Login con Google exitoso");
                 setLoading(false);
                 
                 const profileCompleted = responseData?.user?.profileCompleted;
@@ -154,7 +141,6 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
                 }
               },
               onError: (error) => {
-                console.error("❌ Error en login con Google:", error);
                 setLoading(false);
                 showError(
                   "Error de autenticación",
@@ -164,7 +150,7 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
             });
           }
         } else {
-          console.error("❌ No se recibieron los tokens");
+
           Alert.alert(
             "Error",
             "No se pudieron obtener los tokens de autenticación",
@@ -172,15 +158,12 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
           setLoading(false);
         }
       } catch (error: any) {
-        console.error("❌ Error procesando deep link:", error);
         Alert.alert(
           "Error",
           "Error al procesar la autenticación: " + (error?.message || 'Error desconocido'),
         );
         setLoading(false);
       }
-    } else {
-      console.log("⚠️ URL sin tokens, ignorando:", url);
     }
   };
 
@@ -190,13 +173,9 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
 
       // 🔥 PASO 1: Limpiar sesión previa (importante)
       await supabase.auth.signOut();
-      console.log("🧹 Sesión anterior limpiada");
 
       // IMPORTANTE: Usar Linking.createURL para que Expo lo maneje correctamente
       const redirectUrl = Linking.createURL("auth");
-
-      console.log("🔗 Redirect URL:", redirectUrl);
-      console.log("🔗 Iniciando login con Google...");
 
       // 🔥 PASO 2: Forzar selección de cuenta
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -212,39 +191,29 @@ export default function BtnGoogle({ loading: externalLoading = false } = {}) {
       });
 
       if (error) {
-        console.error("❌ Error OAuth:", error);
         Alert.alert("Error", error.message);
         setLoading(false);
         return;
       }
 
       if (data?.url) {
-        console.log("📱 Abriendo navegador con URL de Google...");
-        console.log("📱 URL completa:", data.url);
-
         // Intentar abrir el navegador - CRÍTICO para React Native
         const result = await WebBrowser.openAuthSessionAsync(
           data.url,
           redirectUrl,
         );
 
-        console.log("🔍 Resultado de WebBrowser:", result);
-
         if (result.type === "success" && result.url) {
           // En React Native, necesitamos manejar el resultado directamente
-          console.log("✅ Autenticación exitosa, procesando URL:", result.url);
           await handleDeepLink({ url: result.url });
         } else if (result.type === "dismiss" || result.type === "cancel") {
-          console.log("⚠️ Usuario cerró el navegador");
           setLoading(false);
         }
       } else {
-        console.error("❌ No hay URL de OAuth disponible");
         Alert.alert("Error", "No se pudo iniciar la autenticación con Google");
         setLoading(false);
       }
     } catch (error: any) {
-      console.error("❌ Error en handleGoogleLogin:", error);
       Alert.alert("Error", error?.message || "Ocurrió un error");
       setLoading(false);
     }

@@ -17,7 +17,6 @@ const TermsAndPrivacyScreen = () => {
   const router = useRouter();
   const [isChecked, setIsChecked] = useState(false);
   const { user } = useAuthSessionStore();
-  console.log('User ID:', user?.id);
   const { mutate: acceptTerms, isPending } = useAcceptTermsAndConditions();
 
   const terms = [
@@ -64,7 +63,7 @@ const TermsAndPrivacyScreen = () => {
   ];
 
   const handleOpenLink = (url: string) => {
-    Linking.openURL(url).catch(err => console.error('Error opening link:', err));
+    Linking.openURL(url).catch(err => {});
   };
 
   const handleAccept = () => {
@@ -79,7 +78,6 @@ const TermsAndPrivacyScreen = () => {
           router.push('/CompleteProfileScreen');
         },
         onError: (error) => {
-          console.error('Error accepting terms:', error);
           // Aquí podrías mostrar un mensaje de error al usuario
         }
       }

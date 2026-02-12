@@ -27,7 +27,6 @@ const CompleteProfileScreen = () => {
   const [showAddSkillInput, setShowAddSkillInput] = useState(false);
   const { mutate: completeUserProfile, isPending, isError } = useCompleteUserProfile();
   const {user } = useAuthSessionStore();
-  console.log('user en complete profile:', user?.id);
 
   interface CompleteProfileForm {
     description?: string;
@@ -108,8 +107,6 @@ const CompleteProfileScreen = () => {
   };
 
  const onSubmit = (data: any) => {
-    console.log('Datos del formulario:', data);
-
     // Crear FormData
     const formData = new FormData();
     formData.append('description', data.description);
@@ -145,7 +142,6 @@ const CompleteProfileScreen = () => {
       { data: formData as any, id: userId },
       {
         onSuccess: (res: any) => {
-          console.log('Perfil guardado exitosamente', res);
           // Si el backend devolvió el usuario actualizado, actualizar el store
           const token = useAuthSessionStore.getState().token;
           const currentUser = useAuthSessionStore.getState().user as any;
@@ -160,7 +156,6 @@ const CompleteProfileScreen = () => {
           router.push('/HomeScreen');
         },
         onError: (error: any) => {
-          console.error('Error al guardar perfil:', error);
           const message = error?.response?.data?.message ?? error?.message ?? 'No se pudo guardar el perfil. Intenta nuevamente.';
           Alert.alert('Error', message);
         }

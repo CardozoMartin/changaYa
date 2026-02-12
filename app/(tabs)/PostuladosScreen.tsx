@@ -1,152 +1,56 @@
+import CardAplications from '@/components/Aplications/CardAplications';
+import { useGetApplicationsByWork } from '@/hooks/useAplyToWork';
+import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
   ActivityIndicator,
-  Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import { router } from 'expo-router';
 
-// Tipos para los postulantes
-interface Applicant {
-  _id: string;
-  userId: string;
+// Tipos para las postulaciones (shape de la API)
+interface Worker {
+  id: string;
   fullName: string;
-  profileImage?: string;
-  rating: number;
-  reviewsCount: number;
-  applicationMessage: string;
-  appliedDate: string;
+  email?: string;
+  imageProfile?: string;
+  description?: string;
 }
 
-// Hook simulado - reemplazar con tu hook real
-const useGetJobApplicants = (jobId: string) => {
-  // Datos de ejemplo - reemplazar con tu API call real
-  const mockData: Applicant[] = [
-    {
-      _id: '1',
-      userId: 'user1',
-      fullName: 'Juan Pérez',
-      profileImage: 'https://randomuser.me/api/portraits/men/1.jpg',
-      rating: 4.8,
-      reviewsCount: 124,
-      applicationMessage: 'Tengo experiencia en reparaciones eléctricas y disponibilidad inmediata. Llevo mis propias herramientas.',
-      appliedDate: '2024-02-01T10:00:00Z',
-    },
-    {
-      _id: '2',
-      userId: 'user2',
-      fullName: 'María García',
-      profileImage: 'https://randomuser.me/api/portraits/women/2.jpg',
-      rating: 4.9,
-      reviewsCount: 89,
-      applicationMessage: 'Puedo realizar el trabajo hoy mismo, cuento con herramientas propias y garantía de satisfacción.',
-      appliedDate: '2024-02-01T11:30:00Z',
-    },
-    {
-      _id: '3',
-      userId: 'user3',
-      fullName: 'Carlos Ruiz',
-      profileImage: 'https://randomuser.me/api/portraits/men/3.jpg',
-      rating: 4.6,
-      reviewsCount: 42,
-      applicationMessage: 'Especialista en este tipo de tareas. Presupuesto flexible y puntualidad garantizada.',
-      appliedDate: '2024-02-01T14:00:00Z',
-    },
-  ];
-
-  return {
-    data: mockData,
-    isLoading: false,
-    error: null,
-  };
-};
-
-interface PostuladosScreenProps {
-  jobId?: string;
-  jobTitle?: string;
+interface Application {
+  id: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  worker: Worker;
 }
 
-const PostuladosScreen = ({ 
-  jobId = 'example-job-id',
-  jobTitle = 'Reparación Eléctrica'
-}: PostuladosScreenProps) => {
-  // Hook para obtener los postulantes
-  const { data: applicants, isLoading, error } = useGetJobApplicants(jobId);
+const PostuladosScreen = () => {
+  // Leer params
+  const params = useLocalSearchParams();
+  const jobId = params.jobId as string;
+  const jobTitle = (params.jobTitle as string) ?? 'Postulados';
 
-  const renderApplicantCard = (applicant: Applicant) => {
-    return (
-      <View key={applicant._id} style={styles.applicantCard}>
-        {/* Avatar y nombre */}
-        <View style={styles.cardHeader}>
-          {applicant.profileImage ? (
-            <Image
-              source={{ uri: applicant.profileImage }}
-              style={styles.avatar}
-            />
-          ) : (
-            <View style={[styles.avatar, styles.avatarPlaceholder]}>
-              <View style={styles.personIconLarge}>
-                <View style={styles.personHeadLarge} />
-                <View style={styles.personBodyLarge} />
-              </View>
-            </View>
-          )}
+  // Hook para obtener las postulaciones (shape Application[])
+  const { data: applications, isLoading: loadingApplications, error: applicationsError } = useGetApplicationsByWork(jobId);
+  const dataJobs = applications as Application[] | undefined;
+  console.log('PostuladosScreen - applications data:', dataJobs);
 
-          <View style={styles.headerInfo}>
-            <Text style={styles.applicantName}>{applicant.fullName}</Text>
-            
-            {/* Rating */}
-            <View style={styles.ratingContainer}>
-              <View style={styles.starIcon} />
-              <Text style={styles.ratingText}>
-                {applicant.rating.toFixed(1)}
-              </Text>
-              <Text style={styles.reviewsText}>
-                ({applicant.reviewsCount} reseñas)
-              </Text>
-            </View>
-          </View>
-        </View>
+  
 
-        {/* Mensaje de postulación */}
-        <View style={styles.messageContainer}>
-          <Text style={styles.messageText}>
-            "{applicant.applicationMessage}"
-          </Text>
-        </View>
 
-        {/* Botones de acción */}
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={styles.profileButton}
-            onPress={() => {
-              // router.push(`/profile/${applicant.userId}`);
-            }}
-          >
-            <Text style={styles.profileButtonText}>Ver Perfil</Text>
-          </TouchableOpacity>
+const handleSelectApplicant = (workerId: string) => {
+}
 
-          <TouchableOpacity
-            style={styles.selectButton}
-            onPress={() => {
-              // Aquí iría la lógica para seleccionar al postulante
-            }}
-          >
-            <Text style={styles.selectButtonText}>Seleccionar</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
+
 
   // Loading state
-  if (isLoading) {
+  if (loadingApplications) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
@@ -159,14 +63,14 @@ const PostuladosScreen = ({
   }
 
   // Error state
-  if (error) {
+  if (applicationsError) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
         <View style={styles.errorContainer}>
           <Text style={styles.errorTitle}>Error al cargar postulantes</Text>
           <Text style={styles.errorMessage}>
-            {error?.message || 'Ocurrió un error inesperado'}
+            {(applicationsError as any)?.message || 'Ocurrió un error inesperado'}
           </Text>
         </View>
       </SafeAreaView>
@@ -188,7 +92,7 @@ const PostuladosScreen = ({
           </View>
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Postulados</Text>
+        <Text style={styles.headerTitle}>{jobTitle || 'Postulados'}</Text>
 
         <View style={styles.spacer} />
       </View>
@@ -208,8 +112,20 @@ const PostuladosScreen = ({
         </View>
 
         {/* Lista de postulantes */}
-        {applicants && applicants.length > 0 ? (
-          applicants.map((applicant) => renderApplicantCard(applicant))
+        {loadingApplications ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#1142d4" />
+            <Text style={styles.loadingText}>Cargando postulantes...</Text>
+          </View>
+        ) : applicationsError ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorTitle}>Error</Text>
+            <Text style={styles.errorMessage}>{(applicationsError as any)?.message || 'No se pudieron cargar los postulantes'}</Text>
+          </View>
+        ) : dataJobs && dataJobs.length > 0 ? (
+          dataJobs.map((application) => (
+            <CardAplications key={application.id} application={application} idWork={jobId} />
+          ))
         ) : (
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIcon}>

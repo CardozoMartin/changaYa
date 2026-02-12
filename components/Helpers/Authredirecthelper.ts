@@ -22,11 +22,9 @@ export async function checkAndRedirectPendingWork({
     // ⏳ Esperar a que el token se guarde
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    console.log("🔍 Verificando trabajos activos...");
 
     // ✅ Llamar directamente a la función
     const workData = await checkWorksActiveFn();
-    console.log("✅ checkWorksActiveFn response:", workData);
 
     const role = workData?.role;
     let status: boolean = false;
@@ -38,7 +36,6 @@ export async function checkAndRedirectPendingWork({
     if (role === "worker") {
       status = workData?.completionStatus?.workerConfirmed;
       if (status === false) {
-        console.log("→ Worker tiene trabajo sin confirmar, redirigiendo...");
         router.push({
           pathname: "/(tabs)/Rateworkerscreen",
           params: {
@@ -52,7 +49,6 @@ export async function checkAndRedirectPendingWork({
     } else if (role === "employer") {
       status = workData?.completionStatus?.employerConfirmed;
       if (status === false) {
-        console.log("→ Employer tiene trabajo sin confirmar, redirigiendo...");
         router.push({
           pathname: "/(tabs)/Rateworkerscreen",
           params: {
@@ -74,7 +70,6 @@ export async function checkAndRedirectPendingWork({
       const activeWork = workData.works[0];
 
       if (activeWork.status === "in_progress") {
-        console.log("→ Trabajo en progreso encontrado, mostrando alerta...");
         showSuccess(
           "¡Bienvenido de nuevo!",
           `Tienes un trabajo pendiente: "${activeWork.workTitle}"`,
@@ -99,15 +94,8 @@ export async function checkAndRedirectPendingWork({
       }
     }
 
-    console.log("ℹ️ No se encontraron trabajos pendientes");
     return false; // No se redirigió, continuar con flujo normal
   } catch (workError: any) {
-    console.error("❌ Error al verificar trabajo activo:", workError);
-    console.error("Detalles del error:", {
-      message: workError?.message,
-      response: workError?.response?.data,
-      status: workError?.response?.status,
-    });
     return false; // En caso de error, continuar con flujo normal
   }
 }
@@ -123,8 +111,6 @@ export function handlePostLoginRedirect({
 }: RedirectOptions) {
   const profileCompleted = responseData?.user?.profileCompleted;
   const acceptTerms = responseData?.user?.acceptTerms;
-
-  console.log("👤 Estado del perfil:", { profileCompleted, acceptTerms });
 
   if (profileCompleted && acceptTerms) {
     showSuccess("¡Inicio de sesión exitoso!", "Bienvenido de nuevo.", {

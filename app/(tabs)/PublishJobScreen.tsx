@@ -62,8 +62,6 @@ const PublishJobScreen = () => {
 
   //Handler para enviar el formulario
 const handleSubmit = onSubmitRHF(async (data: IWorkData) => {
-  console.log('Publicando chamba:', data);
-  
   const formData = new FormData();
   
   // Datos del formulario

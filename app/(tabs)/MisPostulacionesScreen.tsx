@@ -256,7 +256,6 @@ const MisPostulacionesScreen = () => {
             <TouchableOpacity
               style={actionButton.style}
               onPress={() => {
-                console.log('Ver detalles:', application._id);
                 // router.push(`/application-details/${application._id}`);
               }}
             >
@@ -332,7 +331,7 @@ const MisPostulacionesScreen = () => {
 
         <TouchableOpacity 
           style={styles.notificationButton}
-          onPress={() => console.log('Notificaciones')}
+          onPress={() => {}}
         >
           <View style={styles.bellIcon}>
             <View style={styles.bellBody} />
@@ -438,7 +437,7 @@ const MisPostulacionesScreen = () => {
 
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => console.log('Explorar')}
+          onPress={() => {}}
         >
           <View style={styles.searchIcon}>
             <View style={styles.searchCircle} />
@@ -458,7 +457,7 @@ const MisPostulacionesScreen = () => {
 
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => console.log('Chats')}
+          onPress={() => {}}
         >
           <View style={styles.chatIcon}>
             <View style={styles.chatBubble} />
@@ -468,7 +467,7 @@ const MisPostulacionesScreen = () => {
 
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => console.log('Perfil')}
+          onPress={() => {}}
         >
           <View style={styles.profileIcon}>
             <View style={styles.profileHead} />

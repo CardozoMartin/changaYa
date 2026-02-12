@@ -18,6 +18,7 @@ import WorkOpportunitiesList from '@/components/Opportunities/WorkOpportunitiesL
 import { useAuthSessionStore } from '@/store/authSessionStore';
 import WorkCardError from '@/components/Errors/WorkCardError';
 import CardWorksSkeletor from '@/components/Skeleton/CardWorksSkeletor';
+import NotificationBell from '@/components/Notifications/NotificationBell';
 
 
 const OpportunitiesScreen = () => {
@@ -27,25 +28,7 @@ const OpportunitiesScreen = () => {
 
   const { data: works, isLoading, error } = useWork();
 
-  // if(isLoading){
-  //   return (
-  //     <SafeAreaView style={styles.container}>
-  //       <View style={styles.loadingContainer}>
-  //         <Text style={styles.loadingText}>Cargando oportunidades...</Text>
-  //       </View>
-  //     </SafeAreaView>
-  //   );
-  // }
-
-  // if(error){
-  //   return (
-  //     <SafeAreaView style={styles.container}>
-  //       <View style={styles.loadingContainer}>
-  //         <Text style={styles.errorText}>Error al cargar oportunidades.</Text>
-  //       </View>
-  //     </SafeAreaView>
-  //   );
-  // }
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -68,13 +51,7 @@ const OpportunitiesScreen = () => {
                 <Text style={styles.subGreeting}>Encuentra tu próximo trabajo</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.notificationButton}>
-              <View style={styles.bellIcon}>
-                <View style={styles.bellBody} />
-                <View style={styles.bellClapper} />
-              </View>
-              <View style={styles.notificationBadge} />
-            </TouchableOpacity>
+             <NotificationBell iconColor="#1E3A5F" iconSize={26} />
           </View>
 
           {/* Search Bar */}

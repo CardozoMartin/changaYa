@@ -24,29 +24,19 @@ const HomeScreen = () => {
   useEffect(() => {
     const checkPendingWorks = async () => {
       try {
-        console.log('🏠 [HomeScreen] Verificando trabajos pendientes...');
         const workData = await checkWorksActiveFn();
-        console.log('✅ [HomeScreen] workData completo:', JSON.stringify(workData, null, 2));
         
         // Verificar si hay trabajos
         if (!workData?.works || workData.works.length === 0) {
-          console.log('✅ [HomeScreen] No hay trabajos pendientes');
           return;
         }
 
         const role = workData.role;
         const activeWork = workData.works[0];
         
-        console.log('📋 [HomeScreen] Datos del trabajo:', {
-          role,
-          status: activeWork.status,
-          employerConfirmed: activeWork.completionStatus?.employerConfirmed,
-          workerConfirmed: activeWork.completionStatus?.workerConfirmed,
-        });
-
         // Verificar trabajos pendientes de confirmación
         if (role === 'worker' && activeWork.completionStatus?.workerConfirmed === false) {
-          console.log('→ [HomeScreen] Redirigiendo a Rateworkerscreen (worker puntúa a employer)');
+
           router.replace({
             pathname: "/(tabs)/Rateworkerscreen",
             params: { 
@@ -58,7 +48,7 @@ const HomeScreen = () => {
         }
         
         if (role === 'employer' && activeWork.completionStatus?.employerConfirmed === false) {
-          console.log('→ [HomeScreen] Redirigiendo a Rateworkerscreen (employer puntúa a worker)');
+
           router.replace({
             pathname: "/(tabs)/Rateworkerscreen",
             params: { 
@@ -71,7 +61,6 @@ const HomeScreen = () => {
 
         // Verificar trabajos en progreso
         if (activeWork.status === "in_progress") {
-          console.log('→ [HomeScreen] Trabajo en progreso detectado');
           showSuccess(
             "¡Bienvenido de nuevo!", 
             `Tienes un trabajo pendiente: "${activeWork.workTitle}"`, 
@@ -95,9 +84,7 @@ const HomeScreen = () => {
           return;
         }
         
-        console.log('✅ [HomeScreen] No hay trabajos que requieran acción');
       } catch (error) {
-        console.error('❌ [HomeScreen] Error verificando trabajos:', error);
         // No mostrar error al usuario, simplemente continuar normalmente
       }
     };

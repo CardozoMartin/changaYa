@@ -42,7 +42,6 @@ export default function RateWorkerScreen({
   const router = useRouter();
   const [hoveredRating, setHoveredRating] = useState(0);
   const params = useLocalSearchParams();
-  console.log('Parametros recibidos en RateWorkerScreen:', params);
   const { employerId, workerId, workId } = params as { 
     employerId?: string; 
     workerId?: string; 
@@ -70,7 +69,6 @@ export default function RateWorkerScreen({
   };
 
   const onSubmit = async (data: RatingFormData) => {
-    console.log('Datos del formulario:', data);
     const ratingPayload: ICreateRatingDTO = {
       userId: workerId || employerData?.id,
       workId: workId,
@@ -81,11 +79,9 @@ export default function RateWorkerScreen({
 
     postRating(ratingPayload, {
       onSuccess: (response) => {
-        console.log('Rating enviado exitosamente:', response);
         router.back();
       },
       onError: (error) => {
-        console.error('Error al enviar rating:', error);
       }
     });
   };

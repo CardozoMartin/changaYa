@@ -8,10 +8,8 @@ export const usePostRating = ( )=>{
     return useMutation({
         mutationFn: (ratingData: ICreateRatingDTO ) => postRatingFn(ratingData),
         onSuccess: (data) => {
-            console.log('Rating creado con éxito:', data);
         },
         onError: (error) => {
-            console.error('Error al crear el rating:', error);
         }
     });
 }

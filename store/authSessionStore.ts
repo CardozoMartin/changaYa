@@ -23,7 +23,6 @@ export const useAuthSessionStore = create<AuthSessionState>()(
         try {
           AsyncStorage.removeItem('auth-session-storage');
         } catch (err) {
-          console.error('Error clearing auth storage:', err);
         } finally {
           set({ token: null, user: null });
         }

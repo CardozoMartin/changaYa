@@ -49,7 +49,6 @@ export const useGeoRef = () => {
       const data = await response.json();
       return data.provincias || [];
     } catch (error) {
-      console.error('Error searching provinces:', error);
       return [];
     } finally {
       setLoading(false);
@@ -70,7 +69,6 @@ export const useGeoRef = () => {
       const data = await response.json();
       return data.municipios || [];
     } catch (error) {
-      console.error('Error searching municipalities:', error);
       return [];
     } finally {
       setLoading(false);
@@ -91,7 +89,6 @@ export const useGeoRef = () => {
       const data = await response.json();
       return data.localidades || [];
     } catch (error) {
-      console.error('Error searching localities:', error);
       return [];
     } finally {
       setLoading(false);
@@ -164,7 +161,6 @@ export const useGeoRef = () => {
       }).filter((item: StreetSuggestion) => item.formatted); // Filtrar vacíos
       
     } catch (error) {
-      console.error('Error searching streets:', error);
       return [];
     } finally {
       setLoading(false);

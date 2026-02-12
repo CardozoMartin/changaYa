@@ -58,11 +58,6 @@ export const completeUserProfileFn = async (
     });
     return res.data;
   } catch (error: any) {
-    console.error(
-      "[auth.services] completeUserProfileFn error ->",
-      error.message,
-      error?.toJSON ? error.toJSON() : error,
-    );
     throw error;
   }
 };
@@ -80,15 +75,8 @@ export const postAuthLoginFn = async (
       password,
       idGoogle,
     });
-    console.log("Respuesta del login:", res.data);
     return res.data;
   } catch (error: any) {
-    // Log full error for debugging
-    console.error('[postAuthLoginFn] Error completo:', {
-      message: error?.message,
-      response: error?.response?.data,
-      status: error?.response?.status,
-    });
     // Normalizar mensaje para que los handlers puedan leerlo de manera consistente
     const serverMessage = error?.response?.data?.message ?? error?.message ?? 'Error desconocido en login';
     const normalized: any = new Error(serverMessage);
@@ -104,19 +92,15 @@ export const postAuthGoogleLoginFn = async (data: {
   idGoogle?: string;
 }): Promise<LoginResponse> => {
   try {
-    console.log('[postAuthGoogleLoginFn] Enviando datos:', data);
     const res = await api.post("/users/googlelogin", data);
-    console.log('[postAuthGoogleLoginFn] Respuesta del servidor:', res.data);
     
     // ✅ Extraer data.data porque el backend envuelve la respuesta
     if (res.data.success && res.data.data) {
-      console.log('[postAuthGoogleLoginFn] Token y usuario extraídos correctamente');
       return res.data.data; // Retornar solo { token, user }
     }
     
     throw new Error('Respuesta inválida del servidor');
   } catch (error: any) {
-    console.error('[postAuthGoogleLoginFn] Error:', error.message);
     throw error;
   }
 };
@@ -134,6 +118,16 @@ export const getProfileDataFn = async (): Promise<any> => {
 export const getUserByIdFn = async (id: string): Promise<any> => {
   try {
     const res = await api.get(`/users/${id}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+//funcion para obtener el perfil full del usuario para ver su perfil en la postualcion
+export const getFullProfileByIdFn = async (id: string): Promise<any> => {
+  try {
+    const res = await api.get(`/users/profile/full/${id}`);
     return res.data;
   } catch (error) {
     throw error;
