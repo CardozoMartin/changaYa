@@ -75,8 +75,11 @@ export const postAuthLoginFn = async (
       password,
       idGoogle,
     });
+    console.log("Respuesta del login:", res.data); // Log para depuración 
     return res.data;
   } catch (error: any) {
+    const erros = error?.response?.data;
+    console.log(erros)
     // Normalizar mensaje para que los handlers puedan leerlo de manera consistente
     const serverMessage = error?.response?.data?.message ?? error?.message ?? 'Error desconocido en login';
     const normalized: any = new Error(serverMessage);

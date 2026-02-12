@@ -74,7 +74,7 @@ export default function LoginForm() {
       {
         onError: (error: any) => {
           const serverMessage = error?.response?.data?.message ?? error?.message ?? null;
-
+          console.log("Error en login:", serverMessage);
           if (serverMessage === "El usuario no está activo") {
             showError(
               "",
@@ -85,8 +85,8 @@ export default function LoginForm() {
                 primaryButtonText: "Reintentar",
               }
             );
-          } else if (serverMessage) {
-            showError("", serverMessage, {
+          } else if (serverMessage === "Contraseña incorrecta") {
+            showError("", "Contraseña o Email incorrectos.", {
               primaryButtonText: "Reintentar",
             });
           } else {
@@ -172,8 +172,9 @@ export default function LoginForm() {
       <TouchableOpacity
         style={styles.loginButton}
         onPress={onSubmitRHF(handleLogin)}
+        disabled={isPending}
       >
-        <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+        <Text style={styles.loginButtonText}>{isPending ? "Ingresando..." : "Iniciar Sesión"}</Text>
       </TouchableOpacity>
 
       {/* Divider */}

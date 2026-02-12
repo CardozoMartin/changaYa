@@ -6,12 +6,12 @@ import { createClient } from "@supabase/supabase-js";
 import { router } from "expo-router";
 import React from "react";
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useGetProfileData } from "../../hooks/useAuth";
 import NotificationBell from "@/components/Notifications/NotificationBell";
@@ -29,44 +29,48 @@ const ProfileScreen = () => {
   const dataUSer = profileData?.data ?? null;
   const { clearAuth } = useAuthSessionStore();
   const handleLogout = async () => {
-
     try {
       // Limpiar sesión de Supabase (Google OAuth)
       await supabase.auth.signOut();
-    } catch (error) {
-    }
-    
+    } catch (error) {}
+
     // Limpiar sesión del store local
     clearAuth();
-    
+
     // Redirigir a login
-    router.replace('/auth/LoginScreen');
-  }
+    router.replace("/auth/LoginScreen");
+  };
 
   if (isLoading) {
-    return (
-      <ProfileSkeleton />
-    );
+    return <ProfileSkeleton />;
   }
 
   if (error) {
-    return (
-      <ProfileError />
-    );
+    return <ProfileError />;
   }
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header con campanita */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Mi Perfil</Text>
-        
+
         <View style={styles.headerActions}>
           {/* Campanita de notificaciones */}
           <NotificationBell iconColor="#fff" iconSize={24} />
-          
+
           {/* Botón de configuración */}
-          <TouchableOpacity style={styles.settingsButton}>
-            <Ionicons name="settings-outline" size={28} color="#fff" />
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={() => {
+              router.push({
+                pathname: "/(tabs)/EditarPerfil",
+                params: {
+                  user: JSON.stringify(dataUSer)
+                },
+              });
+            }}
+          >
+            <Ionicons name="create-outline" size={28} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -75,20 +79,20 @@ const ProfileScreen = () => {
       <View style={styles.profileSection}>
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
-          {dataUSer?.imageProfile ? (
-            <Image
-              source={{ uri: dataUSer?.imageProfile }}
-              style={styles.avatarImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <Ionicons name="person" size={80} color="#D4A574" />
-          )}
+            {dataUSer?.imageProfile ? (
+              <Image
+                source={{ uri: dataUSer?.imageProfile }}
+                style={styles.avatarImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <Ionicons name="person" size={80} color="#D4A574" />
+            )}
+          </View>
+          <TouchableOpacity style={styles.editButton}>
+            <Ionicons name="camera" size={18} color="#fff" />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.editButton}>
-          <Ionicons name="camera" size={18} color="#fff" />
-        </TouchableOpacity>
-      </View>
         <Text style={styles.userName}>
           {dataUSer?.fullName || "Marcos García"}
         </Text>
@@ -128,210 +132,14 @@ const ProfileScreen = () => {
       </View>
 
       {/* Publications Section */}
-      <View style={styles.publicationsSection}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Mis Publicaciones</Text>
-          <TouchableOpacity>
-            <Text style={styles.seeAllText}>Ver todas →</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Active Job Card */}
-        <View style={styles.jobCard}>
-          <View style={styles.jobIconContainer}>
-            <Ionicons name="brush" size={28} color="#1E3A8A" />
-          </View>
-          <View style={styles.jobContent}>
-            <View style={styles.jobHeader}>
-              <Text style={styles.jobTitle}>Pintura de Fachada</Text>
-              <View style={styles.activeBadge}>
-                <Text style={styles.activeBadgeText}>ACTIVO</Text>
-              </View>
-            </View>
-            <Text style={styles.jobDescription} numberOfLines={1}>
-              Se busca pintor para frente de casa 2...
-            </Text>
-            <View style={styles.jobFooter}>
-              <Text style={styles.jobPrice}>$15.000</Text>
-              <Text style={styles.jobDate}>Publicado hoy</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Completed Job Card 1 */}
-        <View style={styles.jobCard}>
-          <View
-            style={[styles.jobIconContainer, { backgroundColor: "#F3F4F6" }]}
-          >
-            <Ionicons name="hammer" size={28} color="#9CA3AF" />
-          </View>
-          <View style={styles.jobContent}>
-            <View style={styles.jobHeader}>
-              <Text style={[styles.jobTitle, { color: "#9CA3AF" }]}>
-                Reparación de Cañería
-              </Text>
-              <View style={styles.completedBadge}>
-                <Text style={styles.completedBadgeText}>FINALIZADO</Text>
-              </View>
-            </View>
-            <Text
-              style={[styles.jobDescription, { color: "#9CA3AF" }]}
-              numberOfLines={1}
-            >
-              Filtración en cocina, cambio de...
-            </Text>
-            <View style={styles.jobFooter}>
-              <View style={styles.ratingContainer}>
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-              </View>
-              <Text style={styles.jobDate}>2 semanas atrás</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Completed Job Card 2 */}
-        <View style={styles.jobCard}>
-          <View
-            style={[styles.jobIconContainer, { backgroundColor: "#F3F4F6" }]}
-          >
-            <Ionicons name="flash" size={28} color="#9CA3AF" />
-          </View>
-          <View style={styles.jobContent}>
-            <View style={styles.jobHeader}>
-              <Text style={[styles.jobTitle, { color: "#9CA3AF" }]}>
-                Instalación Térmica
-              </Text>
-              <View style={styles.completedBadge}>
-                <Text style={styles.completedBadgeText}>FINALIZADO</Text>
-              </View>
-            </View>
-            <Text
-              style={[styles.jobDescription, { color: "#9CA3AF" }]}
-              numberOfLines={1}
-            >
-              Tablero eléctrico nuevo para...
-            </Text>
-            <View style={styles.jobFooter}>
-              <View style={styles.ratingContainer}>
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star-outline" size={14} color="#FCD34D" />
-                <Ionicons name="star-outline" size={14} color="#FCD34D" />
-              </View>
-              <Text style={styles.jobDate}>1 mes atrás</Text>
-            </View>
-          </View>
-        </View>
-      </View>
 
       {/* Publications Section */}
-      <View style={styles.publicationsSection}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Mis Postulaciones</Text>
-          <TouchableOpacity>
-            <Text style={styles.seeAllText}>Ver todas →</Text>
-          </TouchableOpacity>
-        </View>
 
-        {/* Active Job Card */}
-        <View style={styles.jobCard}>
-          <View style={styles.jobIconContainer}>
-            <Ionicons name="brush" size={28} color="#1E3A8A" />
-          </View>
-          <View style={styles.jobContent}>
-            <View style={styles.jobHeader}>
-              <Text style={styles.jobTitle}>Pintura de Fachada</Text>
-              <View style={styles.activeBadge}>
-                <Text style={styles.activeBadgeText}>ACTIVO</Text>
-              </View>
-            </View>
-            <Text style={styles.jobDescription} numberOfLines={1}>
-              Se busca pintor para frente de casa 2...
-            </Text>
-            <View style={styles.jobFooter}>
-              <Text style={styles.jobPrice}>$15.000</Text>
-              <Text style={styles.jobDate}>Publicado hoy</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Completed Job Card 1 */}
-        <View style={styles.jobCard}>
-          <View
-            style={[styles.jobIconContainer, { backgroundColor: "#F3F4F6" }]}
-          >
-            <Ionicons name="hammer" size={28} color="#9CA3AF" />
-          </View>
-          <View style={styles.jobContent}>
-            <View style={styles.jobHeader}>
-              <Text style={[styles.jobTitle, { color: "#9CA3AF" }]}>
-                Reparación de Cañería
-              </Text>
-              <View style={styles.completedBadge}>
-                <Text style={styles.completedBadgeText}>FINALIZADO</Text>
-              </View>
-            </View>
-            <Text
-              style={[styles.jobDescription, { color: "#9CA3AF" }]}
-              numberOfLines={1}
-            >
-              Filtración en cocina, cambio de...
-            </Text>
-            <View style={styles.jobFooter}>
-              <View style={styles.ratingContainer}>
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-              </View>
-              <Text style={styles.jobDate}>2 semanas atrás</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Completed Job Card 2 */}
-        <View style={styles.jobCard}>
-          <View
-            style={[styles.jobIconContainer, { backgroundColor: "#F3F4F6" }]}
-          >
-            <Ionicons name="flash" size={28} color="#9CA3AF" />
-          </View>
-          <View style={styles.jobContent}>
-            <View style={styles.jobHeader}>
-              <Text style={[styles.jobTitle, { color: "#9CA3AF" }]}>
-                Instalación Térmica
-              </Text>
-              <View style={styles.completedBadge}>
-                <Text style={styles.completedBadgeText}>FINALIZADO</Text>
-              </View>
-            </View>
-            <Text
-              style={[styles.jobDescription, { color: "#9CA3AF" }]}
-              numberOfLines={1}
-            >
-              Tablero eléctrico nuevo para...
-            </Text>
-            <View style={styles.jobFooter}>
-              <View style={styles.ratingContainer}>
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star" size={14} color="#FCD34D" />
-                <Ionicons name="star-outline" size={14} color="#FCD34D" />
-                <Ionicons name="star-outline" size={14} color="#FCD34D" />
-              </View>
-              <Text style={styles.jobDate}>1 mes atrás</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-      <TouchableOpacity style={styles.btnSalir} activeOpacity={0.8}
-        onPress={handleLogout}>
+      <TouchableOpacity
+        style={styles.btnSalir}
+        activeOpacity={0.8}
+        onPress={handleLogout}
+      >
         <Text style={styles.btnSalirText}>Cerrar Sesion</Text>
       </TouchableOpacity>
 
@@ -366,8 +174,8 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   profileSection: {
@@ -388,11 +196,11 @@ const styles = StyleSheet.create({
     borderColor: "#FCD34D",
     justifyContent: "center",
     alignItems: "center",
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   avatarImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     borderRadius: 70,
   },
   editButton: {
@@ -584,17 +392,17 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   btnSalir: {
-    backgroundColor: '#fa0f0f',
+    backgroundColor: "#fa0f0f",
     marginHorizontal: 20,
     paddingVertical: 15,
     borderRadius: 30,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   btnSalirText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 

@@ -1,5 +1,5 @@
 // useAplyToWork.ts
-import { applyToWorkFn, getApplicationsByWorkFn } from "@/services/aplications/aplicationsWorks";
+import { applyToWorkFn, getApplicationsByWorkFn, getMyApplicationsFn } from "@/services/aplications/aplicationsWorks";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 // Hook para postularse a un trabajo
@@ -23,3 +23,11 @@ export const useGetApplicationsByWork = (workId: string) => {
         enabled: !!workId,
     });
 };
+
+//hook para obtener las postulaciones de un usuario logueado
+export const useGetMyApplicationsJobsByUser = () => {
+    return useQuery({
+        queryKey: ['myApplications'],
+        queryFn: () => getMyApplicationsFn(),
+    });
+}

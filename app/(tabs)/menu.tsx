@@ -47,10 +47,10 @@ const BottomTabBar = ({ activeTab = 'profile', onTabPress }: BottomTabBarProps) 
         </View>
       </TouchableOpacity>
 
-      {/* Messages Tab */}
+      {/* Postulaciones Tab */}
       <TouchableOpacity style={styles.tabButton} onPress={() => onTabPress?.('messages')}>
         <Ionicons 
-          name={activeTab === 'messages' ? 'chatbubble' : 'chatbubble-outline'} 
+          name={activeTab === 'messages' ? 'chatbubble' : 'hammer-outline'} 
           size={26} 
           color={activeTab === 'messages' ? '#1E3A8A' : '#9CA3AF'} 
         />
@@ -58,7 +58,7 @@ const BottomTabBar = ({ activeTab = 'profile', onTabPress }: BottomTabBarProps) 
           styles.tabLabel, 
           activeTab === 'messages' && styles.activeTabLabel
         ]}>
-          Mensajes
+          Postulaciones
         </Text>
       </TouchableOpacity>
 
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   tabLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#9CA3AF',
     marginTop: 4,
     fontWeight: '500',

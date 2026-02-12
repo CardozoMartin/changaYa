@@ -1,0 +1,52 @@
+Mis postulaciones: [
+    {
+        "application": {
+            "createdAt": "2026-02-10T00:10:02.607Z",
+            "id": "698a775a38b390a6989366b5",
+            "status": "pending",
+            "updatedAt": "2026-02-10T00:10:02.607Z",
+            "workId": "6986ba85674cdc303dad4aba",
+            "workerId": "69824f12605d7fc8beee3321"
+        },
+        "employer": {
+            "email": "martincardozo1993xp@gmail.com",
+            "fullName": "Martin Cardozo",
+            "id": "69824fca605d7fc8beee3330",
+            "imageProfile": "https://res.cloudinary.com/dcwgnl9ud/image/upload/v1770147905/changaya_profiles/kvpmavfr8ebccpfklxgs.png",
+            "ratingStats": [Object
+            ]
+        },
+        "work": {
+            "description": "Busco desarrollador con experiencia en java y angular para un proyecto de 3 meses ",
+            "id": "6986ba85674cdc303dad4aba",
+            "location": "San miguel  de Tucumán ",
+            "status": "open",
+            "title": "Busco programador java y angular "
+        }
+    },
+    {
+        "application": {
+            "createdAt": "2026-02-07T04:14:59.034Z",
+            "id": "6986bc430a660fad3f92cdf1",
+            "status": "accepted",
+            "updatedAt": "2026-02-07T04:39:12.048Z",
+            "workId": "6986b7e2674cdc303dad4a97",
+            "workerId": "69824f12605d7fc8beee3321"
+        },
+        "employer": {
+            "email": "martincardozo1993xp@gmail.com",
+            "fullName": "Martin Cardozo",
+            "id": "69824fca605d7fc8beee3330",
+            "imageProfile": "https://res.cloudinary.com/dcwgnl9ud/image/upload/v1770147905/changaya_profiles/kvpmavfr8ebccpfklxgs.png",
+            "ratingStats": [Object
+            ]
+        },
+        "work": {
+            "description": "Busco mozo con buena presencia ganas de trabajar viernes y sábado el pago es de 40.000 por dia",
+            "id": "6986b7e2674cdc303dad4a97",
+            "location": "Banda de río sali",
+            "status": "completed",
+            "title": "Busco mozo para fines de semana "
+        }
+    }
+]

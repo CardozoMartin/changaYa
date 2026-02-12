@@ -43,3 +43,13 @@ export const selectApplicantForWorkFn = async (data: ISelectApplicantData): Prom
         throw error;
     }
 }
+
+//funcion para obtener las postulaciones de un usuario logueado
+export const getMyApplicationsFn = async (): Promise<any> => {
+    try {
+        const res = await api.get(`/applications/user`);
+        return res.data.data;
+    } catch (error: any) {
+        throw error;
+    }
+}

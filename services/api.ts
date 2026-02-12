@@ -2,7 +2,7 @@ import { useAuthSessionStore } from "@/store/authSessionStore";
 import axios from "axios";
 
 // Usar la URL pública de EXPO si está disponible (facilita cambios sin editar el código)
-const BASE_URL ="https://fb37-186-124-17-221.ngrok-free.app/api/v1";
+const BASE_URL ="https://ebd8-186-124-167-220.ngrok-free.app/api/v1";
 
 const api = axios.create({
   baseURL: BASE_URL,
