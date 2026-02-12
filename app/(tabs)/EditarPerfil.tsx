@@ -1,17 +1,17 @@
-import { useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import { useLocalSearchParams } from "expo-router";
+import React, { useState } from "react";
 import {
-  View,
+  Image,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  Image,
-  StatusBar,
-  Platform,
-} from 'react-native';
+  View,
+} from "react-native";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Skill {
@@ -24,25 +24,27 @@ interface FloatingInputProps {
   label: string;
   value: string;
   onChangeText: (text: string) => void;
-  keyboardType?: 'default' | 'email-address' | 'phone-pad';
+  keyboardType?: "default" | "email-address" | "phone-pad";
   icon?: React.ReactNode;
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
 }
 
 const FloatingInput: React.FC<FloatingInputProps> = ({
   label,
   value,
   onChangeText,
-  keyboardType = 'default',
+  keyboardType = "default",
   icon,
-  autoCapitalize = 'sentences',
+  autoCapitalize = "sentences",
 }) => {
   const [focused, setFocused] = useState(false);
   const active = focused || value.length > 0;
 
   return (
     <View style={[styles.inputWrapper, focused && styles.inputWrapperFocused]}>
-      <Text style={[styles.floatingLabel, active && styles.floatingLabelActive]}>
+      <Text
+        style={[styles.floatingLabel, active && styles.floatingLabelActive]}
+      >
         {label}
       </Text>
       <View style={styles.inputRow}>
@@ -71,7 +73,11 @@ interface SkillChipProps {
 const SkillChip: React.FC<SkillChipProps> = ({ label, onRemove }) => (
   <View style={styles.chip}>
     <Text style={styles.chipText}>{label}</Text>
-    <TouchableOpacity onPress={onRemove} style={styles.chipClose} hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}>
+    <TouchableOpacity
+      onPress={onRemove}
+      style={styles.chipClose}
+      hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}
+    >
       <Text style={styles.chipCloseText}>×</Text>
     </TouchableOpacity>
   </View>
@@ -86,93 +92,97 @@ const EditarPerfil: React.FC = () => {
   // Extraer datos del usuario al montar el componente (UNA SOLA VEZ)
   React.useEffect(() => {
     if (isLoadedRef.current) {
-      console.log('⚠️ Ya fue cargado, evitando loop');
+      console.log("⚠️ Ya fue cargado, evitando loop");
       return;
     }
 
-    console.log('Params recibidos en EditarPerfil (raw):', params);
+    console.log("Params recibidos en EditarPerfil (raw):", params);
 
     if (params.user) {
       try {
         const userString = params.user as string;
-        
-        if (userString === '[object Object]') {
-          console.log('⚠️ El usuario llegó como [object Object] - error de serialización en ProfileScreen');
-        } else if (typeof userString === 'string') {
+
+        if (userString === "[object Object]") {
+          console.log(
+            "⚠️ El usuario llegó como [object Object] - error de serialización en ProfileScreen",
+          );
+        } else if (typeof userString === "string") {
           const parsedUser = JSON.parse(userString);
           setUserData(parsedUser);
           isLoadedRef.current = true;
-          console.log('✅ Datos del usuario extraídos correctamente');
-          console.log('📋 Nombre:', parsedUser?.fullName);
-          console.log('📧 Email:', parsedUser?.email);
-          console.log('📱 Teléfono:', parsedUser?.phone);
-          console.log('🏠 Dirección:', parsedUser?.address);
-          console.log('🖼️ Imagen:', parsedUser?.imageProfile);
-          console.log('📝 Descripción:', parsedUser?.description);
-          console.log('🛠️ Habilidades:', parsedUser?.hability);
+          console.log("✅ Datos del usuario extraídos correctamente");
+          console.log("📋 Nombre:", parsedUser?.fullName);
+          console.log("📧 Email:", parsedUser?.email);
+          console.log("📱 Teléfono:", parsedUser?.phone);
+          console.log("🏠 Dirección:", parsedUser?.address);
+          console.log("🖼️ Imagen:", parsedUser?.imageProfile);
+          console.log("📝 Descripción:", parsedUser?.description);
+          console.log("🛠️ Habilidades:", parsedUser?.hability);
         } else {
           setUserData(userString);
           isLoadedRef.current = true;
-          console.log('✅ Usuario recibido como objeto');
+          console.log("✅ Usuario recibido como objeto");
         }
       } catch (error) {
-        console.log('❌ Error al parsear usuario:', error);
+        console.log("❌ Error al parsear usuario:", error);
       }
     } else {
-      console.log('⚠️ No hay datos de usuario en los params');
+      console.log("⚠️ No hay datos de usuario en los params");
     }
   }, []); // Dependencia vacía para que se ejecute UNA SOLA VEZ
 
   // Inicializar estados con datos del usuario
-  const [nombre, setNombre] = useState('');
-  const [apellido, setApellido] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [email, setEmail] = useState('');
-  const [direccion, setDireccion] = useState('');
-  const [descripcion, setDescripcion] = useState('');
-  const [contraseña, setContraseña] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [email, setEmail] = useState("");
+  const [direccion, setDireccion] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [contraseña, setContraseña] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [skills, setSkills] = useState<Skill[]>([]);
 
   // Actualizar estados cuando userData cambia (SOLO cuando se carga userData)
   React.useEffect(() => {
     if (userData && isLoadedRef.current) {
-      console.log('📝 Llenando formulario con datos del usuario...');
-      const nameParts = userData.fullName?.split(' ') || [];
-      setNombre(nameParts[0] || '');
-      setApellido(nameParts.slice(1).join(' ') || '');
-      setTelefono(userData.phone || '');
-      setEmail(userData.email || '');
-      setDireccion(userData.address || '');
-      setDescripcion(userData.description || '');
-      setImageUrl(userData.imageProfile || '');
-      
+      console.log("📝 Llenando formulario con datos del usuario...");
+      const nameParts = userData.fullName?.split(" ") || [];
+      setNombre(nameParts[0] || "");
+      setApellido(nameParts.slice(1).join(" ") || "");
+      setTelefono(userData.phone || "");
+      setEmail(userData.email || "");
+      setDireccion(userData.address || "");
+      setDescripcion(userData.description || "");
+      setImageUrl(userData.imageProfile || "");
+
       // Cargar habilidades desde el campo 'hability'
       if (Array.isArray(userData.hability) && userData.hability.length > 0) {
-        const skillsList = userData.hability.map((skill: string, idx: number) => ({
-          id: idx.toString(),
-          label: skill,
-        }));
+        const skillsList = userData.hability.map(
+          (skill: string, idx: number) => ({
+            id: idx.toString(),
+            label: skill,
+          }),
+        );
         setSkills(skillsList);
       }
     }
   }, [userData]);
 
   const removeSkill = (id: string) =>
-    setSkills(prev => prev.filter(s => s.id !== id));
+    setSkills((prev) => prev.filter((s) => s.id !== id));
 
   const handleAddSkill = () => {
     // Placeholder: would open a modal/picker in a real app
     const newSkill: Skill = {
       id: Date.now().toString(),
-      label: 'Nueva Habilidad',
+      label: "Nueva Habilidad",
     };
-    setSkills(prev => [...prev, newSkill]);
+    setSkills((prev) => [...prev, newSkill]);
   };
 
   const handleSave = () => {
-    const skillsLabels = skills.map(s => s.label);
-    console.log('Guardando:', {
+    const skillsLabels = skills.map((s) => s.label);
+    console.log("Guardando:", {
       nombre,
       apellido,
       telefono,
@@ -188,9 +198,7 @@ const EditarPerfil: React.FC = () => {
   };
 
   // Location pin SVG-like icon using unicode
-  const PinIcon = () => (
-    <Text style={styles.pinIcon}>📍</Text>
-  );
+  const PinIcon = () => <Text style={styles.pinIcon}>📍</Text>;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -198,7 +206,10 @@ const EditarPerfil: React.FC = () => {
 
       {/* ── Header ── */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
           <Text style={styles.backArrow}>‹</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Editar Perfil</Text>
@@ -215,12 +226,18 @@ const EditarPerfil: React.FC = () => {
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
             {imageUrl ? (
-              <Image
-                source={{ uri: imageUrl }}
-                style={styles.avatar}
-              />
+              <Image source={{ uri: imageUrl }} style={styles.avatar} />
             ) : (
-              <View style={[styles.avatar, { backgroundColor: '#e0e0e0', justifyContent: 'center', alignItems: 'center' }]}>
+              <View
+                style={[
+                  styles.avatar,
+                  {
+                    backgroundColor: "#e0e0e0",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                ]}
+              >
                 <Text style={{ fontSize: 40 }}>👤</Text>
               </View>
             )}
@@ -294,13 +311,16 @@ const EditarPerfil: React.FC = () => {
         <View style={styles.section}>
           <View style={styles.skillsHeader}>
             <Text style={styles.sectionLabel}>MIS HABILIDADES</Text>
-            <TouchableOpacity onPress={handleAddSkill} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
+            <TouchableOpacity
+              onPress={handleAddSkill}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
               <Text style={styles.addSkillText}>+ AGREGAR</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.chipsContainer}>
-            {skills.map(skill => (
+            {skills.map((skill) => (
               <SkillChip
                 key={skill.id}
                 label={skill.label}
@@ -316,7 +336,11 @@ const EditarPerfil: React.FC = () => {
 
       {/* ── Save Button (floating at bottom) ── */}
       <View style={styles.saveContainer}>
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSave} activeOpacity={0.88}>
+        <TouchableOpacity
+          style={styles.saveBtn}
+          onPress={handleSave}
+          activeOpacity={0.88}
+        >
           <Text style={styles.saveIcon}>💾</Text>
           <Text style={styles.saveBtnText}>Guardar Cambios</Text>
         </TouchableOpacity>
@@ -326,13 +350,13 @@ const EditarPerfil: React.FC = () => {
 };
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-const TEAL = '#1a7a8a';
-const TEAL_DARK = '#155f6d';
-const TEAL_LIGHT = '#e8f4f6';
-const BORDER = '#d6e4e8';
-const TEXT_PRIMARY = '#1a2332';
-const TEXT_SECONDARY = '#8fa3ad';
-const BG = '#f4f7f9';
+const TEAL = "#1a7a8a";
+const TEAL_DARK = "#155f6d";
+const TEAL_LIGHT = "#e8f4f6";
+const BORDER = "#d6e4e8";
+const TEXT_PRIMARY = "#1a2332";
+const TEXT_SECONDARY = "#8fa3ad";
+const BG = "#f4f7f9";
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -342,9 +366,9 @@ const styles = StyleSheet.create({
 
   // ── Header ──
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 14,
     backgroundColor: BG,
@@ -352,8 +376,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 36,
     height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   backArrow: {
     fontSize: 32,
@@ -363,7 +387,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: TEXT_PRIMARY,
     letterSpacing: 0.2,
   },
@@ -382,14 +406,14 @@ const styles = StyleSheet.create({
 
   // ── Avatar ──
   avatarSection: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 24,
-    backgroundColor: '#eaf2f5',
+    backgroundColor: "#eaf2f5",
     borderRadius: 20,
     marginBottom: 24,
   },
   avatarContainer: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 12,
   },
   avatar: {
@@ -397,12 +421,12 @@ const styles = StyleSheet.create({
     height: 110,
     borderRadius: 55,
     borderWidth: 3,
-    borderColor: '#fff',
-    backgroundColor: '#d4c4b0',
+    borderColor: "#fff",
+    backgroundColor: "#d4c4b0",
     // Shadow
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.12,
         shadowRadius: 10,
@@ -413,17 +437,17 @@ const styles = StyleSheet.create({
     }),
   },
   cameraBtn: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 2,
     right: -2,
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: TEAL,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 2.5,
-    borderColor: '#fff',
+    borderColor: "#fff",
     ...Platform.select({
       ios: {
         shadowColor: TEAL,
@@ -440,7 +464,7 @@ const styles = StyleSheet.create({
   changePhotoText: {
     color: TEAL,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     letterSpacing: 0.1,
   },
 
@@ -451,7 +475,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: "700",
     color: TEXT_SECONDARY,
     letterSpacing: 1.1,
     marginBottom: 4,
@@ -459,7 +483,7 @@ const styles = StyleSheet.create({
 
   // ── Row layout ──
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   halfCol: {
@@ -471,7 +495,7 @@ const styles = StyleSheet.create({
 
   // ── Floating Input ──
   inputWrapper: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 14,
     borderWidth: 1.5,
     borderColor: BORDER,
@@ -479,10 +503,10 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 10,
     minHeight: 64,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
     ...Platform.select({
       ios: {
-        shadowColor: '#b0c8d0',
+        shadowColor: "#b0c8d0",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.15,
         shadowRadius: 3,
@@ -505,22 +529,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: TEXT_SECONDARY,
     marginBottom: 2,
-    fontWeight: '400',
+    fontWeight: "400",
   },
   floatingLabelActive: {
     fontSize: 12,
     color: TEAL,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   textInput: {
     flex: 1,
     fontSize: 15,
     color: TEXT_PRIMARY,
-    fontWeight: '400',
+    fontWeight: "400",
     paddingVertical: 0,
     paddingHorizontal: 0,
   },
@@ -534,25 +558,25 @@ const styles = StyleSheet.create({
 
   // ── Skills ──
   skillsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   addSkillText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
     color: TEAL,
     letterSpacing: 0.8,
   },
   chipsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     borderWidth: 1.5,
     borderColor: BORDER,
     borderRadius: 50,
@@ -562,7 +586,7 @@ const styles = StyleSheet.create({
     gap: 6,
     ...Platform.select({
       ios: {
-        shadowColor: '#b0c8d0',
+        shadowColor: "#b0c8d0",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
@@ -573,43 +597,43 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 14,
     color: TEXT_PRIMARY,
-    fontWeight: '400',
+    fontWeight: "400",
   },
   chipClose: {
     width: 22,
     height: 22,
     borderRadius: 11,
     backgroundColor: TEAL_LIGHT,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   chipCloseText: {
     fontSize: 16,
     color: TEAL,
     lineHeight: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: -1,
   },
 
   // ── Save Button ──
   saveContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     paddingHorizontal: 20,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
+    paddingBottom: Platform.OS === "ios" ? 34 : 20,
     paddingTop: 12,
     backgroundColor: BG,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.05)',
+    borderTopColor: "rgba(0,0,0,0.05)",
   },
   saveBtn: {
     backgroundColor: TEAL_DARK,
     borderRadius: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 18,
     gap: 10,
     ...Platform.select({
@@ -626,9 +650,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   saveBtnText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 0.3,
   },
 });

@@ -38,7 +38,9 @@ interface ApplicationData {
 }
 
 const ApplicationDetailsScreen = () => {
-  const { applicationData } = useLocalSearchParams<{ applicationData?: string }>();
+  const { applicationData } = useLocalSearchParams<{
+    applicationData?: string;
+  }>();
 
   const [loading, setLoading] = React.useState(false);
 
@@ -114,14 +116,20 @@ const ApplicationDetailsScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalles de Postulación</Text>
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Imagen del trabajo */}
         <View style={styles.imageSection}>
           {(() => {
@@ -148,7 +156,12 @@ const ApplicationDetailsScreen = () => {
               { backgroundColor: statusConfig.bgColor },
             ]}
           >
-            <Text style={[styles.statusTextOverlay, { color: statusConfig.textColor }]}>
+            <Text
+              style={[
+                styles.statusTextOverlay,
+                { color: statusConfig.textColor },
+              ]}
+            >
               {statusConfig.label}
             </Text>
           </View>
@@ -161,7 +174,12 @@ const ApplicationDetailsScreen = () => {
 
           {/* Estado descriptor */}
           <View style={styles.statusDescriptionBox}>
-            <Text style={[styles.statusDescription, { color: statusConfig.textColor }]}>
+            <Text
+              style={[
+                styles.statusDescription,
+                { color: statusConfig.textColor },
+              ]}
+            >
               {statusConfig.description}
             </Text>
           </View>
@@ -182,7 +200,9 @@ const ApplicationDetailsScreen = () => {
 
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>📅 Postulado el</Text>
-              <Text style={styles.infoValue}>{formatDate(data.application.createdAt)}</Text>
+              <Text style={styles.infoValue}>
+                {formatDate(data.application.createdAt)}
+              </Text>
             </View>
 
             <View style={styles.infoRow}>
@@ -206,7 +226,9 @@ const ApplicationDetailsScreen = () => {
 
               {/* Información del empleador */}
               <View style={styles.employerInfo}>
-                <Text style={styles.employerName}>{data.employer.fullName}</Text>
+                <Text style={styles.employerName}>
+                  {data.employer.fullName}
+                </Text>
                 <Text style={styles.employerEmail}>{data.employer.email}</Text>
 
                 {/* Rating si existe */}
@@ -227,7 +249,9 @@ const ApplicationDetailsScreen = () => {
             {data.application.status === "accepted" && (
               <>
                 <TouchableOpacity style={styles.primaryButton}>
-                  <Text style={styles.primaryButtonText}>Contactar Empleador</Text>
+                  <Text style={styles.primaryButtonText}>
+                    Contactar Empleador
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.secondaryButton}>
                   <Text style={styles.secondaryButtonText}>Ver Chat</Text>
@@ -238,10 +262,14 @@ const ApplicationDetailsScreen = () => {
             {data.application.status === "pending" && (
               <>
                 <TouchableOpacity style={styles.primaryButton}>
-                  <Text style={styles.primaryButtonText}>Contactar Empleador</Text>
+                  <Text style={styles.primaryButtonText}>
+                    Contactar Empleador
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.dangerButton}>
-                  <Text style={styles.dangerButtonText}>Cancelar Postulación</Text>
+                  <Text style={styles.dangerButtonText}>
+                    Cancelar Postulación
+                  </Text>
                 </TouchableOpacity>
               </>
             )}
@@ -252,14 +280,18 @@ const ApplicationDetailsScreen = () => {
                   <Text style={styles.primaryButtonText}>Ver Reseña</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.secondaryButton}>
-                  <Text style={styles.secondaryButtonText}>Ver Perfil del Empleador</Text>
+                  <Text style={styles.secondaryButtonText}>
+                    Ver Perfil del Empleador
+                  </Text>
                 </TouchableOpacity>
               </>
             )}
 
             {data.application.status === "rejected" && (
               <TouchableOpacity style={styles.secondaryButton}>
-                <Text style={styles.secondaryButtonText}>Explorar Otros Trabajos</Text>
+                <Text style={styles.secondaryButtonText}>
+                  Explorar Otros Trabajos
+                </Text>
               </TouchableOpacity>
             )}
           </View>

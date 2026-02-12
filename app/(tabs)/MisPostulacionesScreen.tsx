@@ -43,7 +43,11 @@ const MisPostulacionesScreen = () => {
   const [activeTab, setActiveTab] = useState<"all" | ApplicationStatus>("all");
 
   // Hook para obtener las postulaciones reales
-  const { data: applications = [], isLoading, error } = useGetMyApplicationsJobsByUser();
+  const {
+    data: applications = [],
+    isLoading,
+    error,
+  } = useGetMyApplicationsJobsByUser();
 
   console.log("Mis postulaciones:", applications);
 
@@ -51,7 +55,9 @@ const MisPostulacionesScreen = () => {
   const filteredApplications: Application[] =
     activeTab === "all"
       ? applications
-      : (applications.filter((app: Application) => app.application.status === activeTab) as Application[]);
+      : (applications.filter(
+          (app: Application) => app.application.status === activeTab,
+        ) as Application[]);
 
   // Formatear fecha
   const formatDate = (dateString: string) => {

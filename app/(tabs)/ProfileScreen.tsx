@@ -1,4 +1,5 @@
 import ProfileError from "@/components/Errors/ProfileError";
+import NotificationBell from "@/components/Notifications/NotificationBell";
 import ProfileSkeleton from "@/components/Skeleton/ProfileSkeleton";
 import { useAuthSessionStore } from "@/store/authSessionStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,7 +15,6 @@ import {
   View,
 } from "react-native";
 import { useGetProfileData } from "../../hooks/useAuth";
-import NotificationBell from "@/components/Notifications/NotificationBell";
 
 // Configuración de Supabase
 const supabaseUrl = "https://mjuflmbpbpsltvbjuqzj.supabase.co";
@@ -65,7 +65,7 @@ const ProfileScreen = () => {
               router.push({
                 pathname: "/(tabs)/EditarPerfil",
                 params: {
-                  user: JSON.stringify(dataUSer)
+                  user: JSON.stringify(dataUSer),
                 },
               });
             }}
